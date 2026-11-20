@@ -225,9 +225,10 @@
 
     // Separate module batches can be pushed below:
     // dsaQuizData.push(...);
-      // -----------------------------------------------------------------------
-  // SUB-BLOCK 2: MODULE 2 — Linked Lists, Stacks & Queues (22 Qs)
-  // -----------------------------------------------------------------------
+      dsaQuizData.push(// -----------------------------------------------------------------------
+// SUB-BLOCK 2: MODULE 2 — Linked Lists, Stacks & Queues (22 Qs)
+// -----------------------------------------------------------------------
+dsaQuizData.push(
   {
     module: "m2", part: "Linked List Basics",
     q: "Unlike a static array, how are nodes of a dynamic linked list typically organized in memory?",
@@ -381,7 +382,8 @@
     options: ["Most recently inserted item", "Item with the minimum priority/key value", "Middle element", "Oldest item ignoring priority"],
     correct: 1,
     explain: "A min-priority queue always dequeues the element with the smallest priority value first."
-  },
+  }
+);
     let score = 0;
     const answeredMap = new Map();
 
