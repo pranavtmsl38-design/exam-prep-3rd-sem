@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DSA Hub — MAKAUT B.Tech Exam Prep</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 500: '#3b82f6', 600: '#2563eb' }
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
+
+  <!-- Top Navigation -->
+  <header class="sticky top-0 z-20 border-b border-slate-800 bg-slate-900/90 backdrop-blur">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h1 class="text-lg sm:text-xl font-bold tracking-tight">DSA Hub — Data Structures & Algorithms</h1>
+        <p class="text-xs text-slate-400">Module-Wise Quiz Bank • Min 20+ Questions Per Module • Full Explanations</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="electronics-hub.html" class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 hover:bg-slate-800">
+          Electronics Hub
+        </a>
+        <button type="button" onclick="toggleTheme()" class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 hover:bg-slate-800">
+          Toggle Theme
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-6 space-y-6">
+
+    <!-- Filter & Score Bar -->
+    <div class="p-4 rounded-2xl border border-slate-800 bg-slate-900/70 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex flex-wrap items-center gap-2">
+        <label for="moduleFilter" class="text-xs font-semibold uppercase tracking-wider text-slate-400">Module:</label>
+        <select id="moduleFilter" onchange="resetAndRender()" class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-sm">
+          <option value="all">All Modules</option>
+          <option value="m1">Module 1: Complexity, Recursion, Arrays & Pointers</option>
+          <option value="m2">Module 2: Linked Lists, Stacks & Queues</option>
+          <option value="m3">Module 3: Trees & Binary Search Trees</option>
+          <option value="m4">Module 4: Hashing, Graphs, Searching & Sorting</option>
+        </select>
+
+        <input
+          id="topicSearch"
+          type="text"
+          oninput="resetAndRender()"
+          placeholder="Filter subtopic / keyword..."
+          class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-sm placeholder:text-slate-400"
+        />
+      </div>
+
+      <div class="flex items-center gap-3 text-sm">
+        <span id="questionCounter" class="font-semibold text-slate-300">0 Questions</span>
+        <span id="scoreBadge" class="px-3 py-1 rounded-full bg-brand-600/20 border border-brand-500/40 text-brand-300 font-semibold">
+          Score: 0
+        </span>
+        <button type="button" onclick="resetQuizSession()" class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 hover:bg-slate-800">
+          Reset
+        </button>
+      </div>
+    </div>
+
+    <!-- Quiz Questions List -->
+    <div id="dsaQuizContainer" class="space-y-4"></div>
+
+  </main>
+
+  <script>
+    const dsaQuizData = [
+      // ===== MODULE 1: COMPLEXITY, RECURSION, ARRAYS & POINTERS (20 Qs) =====
+      {
+        module: "m1", part: "Asymptotic Notation",
+        q: "Which asymptotic notation represents the worst-case upper bound of an algorithm's growth rate?",
+        options: ["Big-Omega (Ω)", "Big-Theta (Θ)", "Big-O (O)", "Little-omega (ω)"],
+        correct: 2,
+        explain: "Big-O gives an asymptotic upper bound on growth rate for large input n, commonly used for worst-case analysis."
+      },
+      {
+        module: "m1", part: "Asymptotic Notation",
+        q: "Which notation represents a tight asymptotic bound (both upper and lower)?",
+        options: ["Big-O", "Big-Omega", "Big-Theta", "Little-o"],
+        correct: 2,
+        explain: "f(n) = Θ(g(n)) means f(n) is bounded both above and below by constant multiples of g(n) for large n."
+      },
+      {
+        module: "m1", part: "Growth Hierarchy",
+        q: "Arrange in increasing order of growth rate as n → ∞: n^2, log n, n, 2^n.",
+        options: ["log n, n, n^2, 2^n", "n, log n, n^2, 2^n", "log n, n^2, n, 2^n", "n^2, log n, n, 2^n"],
+        correct: 0,
+        explain: "Standard growth order for large n: O(1) < O(log n) < O(n) < O(n log n) < O(n^2) < O(2^n) < O(n!)."
+      },
+      {
+        module: "m1", part: "Loop Complexity",
+        q: "What is the time complexity of a single loop running n times with O(1) body work?",
+        options: ["O(1)", "O(log n)", "O(n)", "O(n^2)"],
+        correct: 2,
+        explain: "Executing O(1) work n times gives O(n) linear time complexity."
+      },
+      {
+        module: "m1", part: "Nested Loops",
+        q: "What is the time complexity of two nested loops each running from 1 to n with constant work?",
+        options: ["O(n)", "O(n log n)", "O(n^2)", "O(n^3)"],
+        correct: 2,
+        explain: "Total iterations = n × n = n^2, so time complexity is O(n^2)."
+      },
+      {
+        module: "m1", part: "Logarithmic Complexity",
+        q: "A variable starts at n and is halved (k = k / 2) each step until reaching 1. How many steps occur?",
+        options: ["n", "n / 2", "Approximately log2(n)", "n^2"],
+        correct: 2,
+        explain: "Repeatedly dividing n by 2 until reaching 1 takes log2(n) steps, giving O(log n) complexity."
+      },
+      {
+        module: "m1", part: "Space Complexity",
+        q: "What is the auxiliary space complexity of iterative binary search on an array of size n?",
+        options: ["O(n)", "O(log n)", "O(1)", "O(n log n)"],
+        correct: 2,
+        explain: "Iterative binary search uses constant extra variables (low, high, mid), taking O(1) auxiliary space."
+      },
+      {
+        module: "m1", part: "Recursion Stack",
+        q: "What is the auxiliary call-stack space complexity of recursive factorial(n) with recursion depth n?",
+        options: ["O(1)", "O(log n)", "O(n)", "O(2^n)"],
+        correct: 2,
+        explain: "Each active recursive call pushes a frame onto the call stack up to depth n, taking O(n) space."
+      },
+      {
+        module: "m1", part: "Recursion Base Case",
+        q: "What happens if a recursive function has no reachable base case?",
+        options: ["Compiler turns it into O(1)", "Infinite recursion leading to stack overflow", "It returns 0 safely", "It converts into a queue"],
+        correct: 1,
+        explain: "Without a terminating base case, stack frames keep accumulating until stack overflow occurs."
+      },
+      {
+        module: "m1", part: "Recurrence Relation",
+        q: "What is the time complexity of T(n) = T(n - 1) + O(1) with T(0) = O(1)?",
+        options: ["O(log n)", "O(n)", "O(n log n)", "O(n^2)"],
+        correct: 1,
+        explain: "Expanding T(n) = T(n-1) + c gives T(0) + n·c = O(n)."
+      },
+      {
+        module: "m1", part: "Master Theorem",
+        q: "What is the time complexity of T(n) = 2T(n/2) + O(n)?",
+        options: ["O(n)", "O(n log n)", "O(n^2)", "O(log n)"],
+        correct: 1,
+        explain: "Here a = 2, b = 2, so n^(log_b a) = n^1 matches f(n) = Θ(n), giving Θ(n log n)."
+      },
+      {
+        module: "m1", part: "Array Random Access",
+        q: "Why does accessing arr[i] in a 1D array take O(1) time?",
+        options: ["Array is sorted", "Elements are stored in contiguous memory", "Array uses hashing", "Indices start at 1"],
+        correct: 1,
+        explain: "Contiguous memory allows direct address calculation: Base + i × sizeof(element) in O(1) time."
+      },
+      {
+        module: "m1", part: "1D Address Calculation",
+        q: "A 1D int array (4 bytes/element) starts at address 2000. What is the address of index 7?",
+        options: ["2007", "2024", "2028", "2032"],
+        correct: 2,
+        explain: "Address = 2000 + 7 × 4 = 2028."
+      },
+      {
+        module: "m1", part: "Array Insertion",
+        q: "Worst-case time complexity to insert an element at index 0 of a static array of n elements is:",
+        options: ["O(1)", "O(log n)", "O(n)", "O(n^2)"],
+        correct: 2,
+        explain: "Existing n elements must shift right by one slot to free index 0, taking O(n) time."
+      },
+      {
+        module: "m1", part: "Row-Major 2D Array",
+        q: "In row-major order for 2D array A[R][C] (0-indexed), what is the element offset for A[i][j]?",
+        options: ["i * R + j", "i * C + j", "j * R + i", "j * C + i"],
+        correct: 1,
+        explain: "Each row has C elements in row-major layout, so i complete rows plus j columns gives offset i × C + j."
+      },
+      {
+        module: "m1", part: "Column-Major 2D Array",
+        q: "In column-major order for 2D array A[R][C] (0-indexed), what is the element offset for A[i][j]?",
+        options: ["i * C + j", "j * R + i", "i * R + j", "j * C + i"],
+        correct: 1,
+        explain: "Each column has R elements in column-major layout, so j complete columns plus i rows gives offset j × R + i."
+      },
+      {
+        module: "m1", part: "Pointer Arithmetic",
+        q: "If int *p is at address 5000 and sizeof(int) = 4, what address does (p + 3) point to?",
+        options: ["5003", "5004", "5012", "5016"],
+        correct: 2,
+        explain: "Pointer arithmetic adds 3 × sizeof(int) = 3 × 4 = 12 bytes, giving 5012."
+      },
+      {
+        module: "m1", part: "Dangling Pointer",
+        q: "What is a dangling pointer?",
+        options: ["A NULL pointer", "A pointer referencing freed or out-of-scope memory", "A pointer to a constant", "A void pointer"],
+        correct: 1,
+        explain: "After free(ptr), ptr still holds the old address if not set to NULL; dereferencing it causes undefined behavior."
+      },
+      {
+        module: "m1", part: "Dynamic Allocation",
+        q: "Which C function allocates memory for an array and initializes all bytes to zero?",
+        options: ["malloc()", "calloc()", "realloc()", "free()"],
+        correct: 1,
+        explain: "calloc(num, size) allocates num × size bytes and zero-initializes the allocated memory."
+      },
+      {
+        module: "m1", part: "Memory Leak",
+        q: "What causes a memory leak?",
+        options: ["Using loop counters", "Allocating heap memory without freeing it when no longer reachable", "Using recursion", "Using const"],
+        correct: 1,
+        explain: "If dynamically allocated memory is never freed and references to it are lost, memory remains leaked until exit."
+      }
+    ];
+
+    // Separate module batches can be pushed below:
+    // dsaQuizData.push(...);
+
+    let score = 0;
+    const answeredMap = new Map();
+
+    function toggleTheme() {
+      document.documentElement.classList.toggle("dark");
+    }
+
+    function selectOption(globalIdx, optIdx) {
+      const q = dsaQuizData[globalIdx];
+      if (!q) return;
+
+      const prevChoice = answeredMap.get(globalIdx);
+      if (prevChoice === q.correct) score -= 1;
+
+      answeredMap.set(globalIdx, optIdx);
+      if (optIdx === q.correct) score += 1;
+
+      document.getElementById("scoreBadge").textContent = `Score: ${score}`;
+      renderQuiz();
+    }
+
+    function resetQuizSession() {
+      score = 0;
+      answeredMap.clear();
+      document.getElementById("scoreBadge").textContent = "Score: 0";
+      renderQuiz();
+    }
+
+    function resetAndRender() {
+      renderQuiz();
+    }
+
+    function renderQuiz() {
+      const mod = document.getElementById("moduleFilter").value;
+      const query = document.getElementById("topicSearch").value.trim().toLowerCase();
+      const container = document.getElementById("dsaQuizContainer");
+      const counter = document.getElementById("questionCounter");
+
+      const items = dsaQuizData
+        .map((item, idx) => ({ ...item, _idx: idx }))
+        .filter(item => {
+          const matchMod = (mod === "all" || item.module === mod);
+          const matchText = !query ||
+            item.q.toLowerCase().includes(query) ||
+            item.part.toLowerCase().includes(query) ||
+            item.explain.toLowerCase().includes(query);
+          return matchMod && matchText;
+        });
+
+      counter.textContent = `${items.length} Questions`;
+
+      if (!items.length) {
+        container.innerHTML = `<div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 text-sm text-slate-400">No DSA questions match the selected filter yet.</div>`;
+        return;
+      }
+
+      container.innerHTML = items.map((item, i) => {
+        const chosen = answeredMap.get(item._idx);
+        const hasAnswered = chosen !== undefined;
+
+        return `
+          <div class="p-5 rounded-2xl border border-slate-800 bg-slate-900/70 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold">
+              <span class="uppercase tracking-wider text-brand-300">${item.module.toUpperCase()} • ${item.part}</span>
+              <span class="px-2.5 py-0.5 rounded-full border border-slate-700 text-slate-300">Q${i + 1}</span>
+            </div>
+            <p class="font-medium text-slate-100">${item.q}</p>
+            <div class="space-y-2 text-sm">
+              ${item.options.map((opt, oi) => {
+                let styleClass = "border-slate-800 bg-slate-950/60 hover:border-slate-700";
+                if (hasAnswered) {
+                  if (oi === item.correct) styleClass = "border-emerald-500/60 bg-emerald-950/40 text-emerald-200";
+                  else if (oi === chosen) styleClass = "border-rose-500/60 bg-rose-950/40 text-rose-200";
+                }
+                return `
+                  <button
+                    type="button"
+                    onclick="selectOption(${item._idx}, ${oi})"
+                    class="w-full text-left px-3.5 py-2 rounded-xl border ${styleClass} transition"
+                  >
+                    ${opt}
+                  </button>
+                `;
+              }).join("")}
+            </div>
+            ${hasAnswered ? `
+              <div class="p-3.5 rounded-xl border border-slate-700 bg-slate-950/90 text-sm space-y-1">
+                <div class="font-semibold ${chosen === item.correct ? "text-emerald-400" : "text-amber-300"}">
+                  ${chosen === item.correct ? "Correct!" : `Correct Answer: ${item.options[item.correct]}`}
+                </div>
+                <p class="text-slate-300">${item.explain}</p>
+              </div>
+            ` : ""}
+          </div>
+        `;
+      }).join("");
+    }
+
+    renderQuiz();
+  </script>
+</body>
+</html>
