@@ -225,7 +225,163 @@
 
     // Separate module batches can be pushed below:
     // dsaQuizData.push(...);
-
+      // -----------------------------------------------------------------------
+  // SUB-BLOCK 2: MODULE 2 — Linked Lists, Stacks & Queues (22 Qs)
+  // -----------------------------------------------------------------------
+  {
+    module: "m2", part: "Linked List Basics",
+    q: "Unlike a static array, how are nodes of a dynamic linked list typically organized in memory?",
+    options: ["Only in contiguous memory blocks", "In heap nodes connected via pointers", "Inside CPU registers", "In a fixed-size lookup table"],
+    correct: 1,
+    explain: "Linked list nodes are usually allocated dynamically on the heap and linked using pointers, avoiding contiguous resizing overhead."
+  },
+  {
+    module: "m2", part: "Singly Linked List",
+    q: "In a singly linked list with only a head pointer, what is the time complexity to insert a node at the beginning?",
+    options: ["O(1)", "O(log n)", "O(n)", "O(n^2)"],
+    correct: 0,
+    explain: "Setting newNode->next = head and head = newNode takes constant O(1) time without traversing the list."
+  },
+  {
+    module: "m2", part: "Singly Linked List",
+    q: "In a singly linked list with only a head pointer (no tail pointer), what is the time complexity to insert at the end?",
+    options: ["O(1)", "O(log n)", "O(n)", "O(n^2)"],
+    correct: 2,
+    explain: "Without a tail pointer, traversal must start from head through n nodes to reach the last node, taking O(n) time."
+  },
+  {
+    module: "m2", part: "Singly Linked List",
+    q: "What is the worst-case time complexity to search for a value in an unsorted singly linked list of n nodes?",
+    options: ["O(1)", "O(log n)", "O(n)", "O(n^2)"],
+    correct: 2,
+    explain: "Linear traversal from head is required in the worst case (key at the end or not present), taking O(n) time."
+  },
+  {
+    module: "m2", part: "Singly Linked List",
+    q: "In a singly linked list, why do you generally need a pointer to the predecessor node to delete a given node?",
+    options: ["Pointers cannot be modified", "You need the previous node's next pointer to unlink the target node safely", "Nodes cannot be freed", "It requires sorting first"],
+    correct: 1,
+    explain: "To unlink a node in a singly linked list, prev->next must be updated to curr->next (unless deleting head)."
+  },
+  {
+    module: "m2", part: "Doubly Linked List",
+    q: "Which pointers does each node in a standard doubly linked list maintain?",
+    options: ["Only next", "Both prev and next", "Only prev", "next, parent, and child"],
+    correct: 1,
+    explain: "Each doubly linked list node stores both prev and next pointers, enabling forward and backward traversal."
+  },
+  {
+    module: "m2", part: "Doubly Linked List",
+    q: "Given a pointer directly to an interior node in a doubly linked list, why can it be unlinked in O(1) time?",
+    options: ["No neighbor pointers exist", "Direct access to prev allows updating prev->next and next->prev in O(1)", "It shifts array elements", "Doubly lists are always sorted"],
+    correct: 1,
+    explain: "Because curr->prev is directly accessible, curr->prev->next = curr->next and curr->next->prev = curr->prev run in O(1) time."
+  },
+  {
+    module: "m2", part: "Circular Linked List",
+    q: "In a circular singly linked list, what does the last node's next pointer reference?",
+    options: ["NULL", "head", "A sentinel tail node", "Itself always"],
+    correct: 1,
+    explain: "In a circular linked list, the last node links back to head instead of NULL, forming a closed loop."
+  },
+  {
+    module: "m2", part: "Pointer Safety",
+    q: "Why should you check `ptr != NULL` before dereferencing a linked list node pointer in C?",
+    options: ["To speed up loops", "To prevent null-pointer dereference crashes on empty lists or list ends", "Because NULL equals 1", "To convert pointers to integers"],
+    correct: 1,
+    explain: "Dereferencing a NULL pointer causes undefined behavior or a segmentation fault; checking ptr != NULL keeps traversal and deletion safe."
+  },
+  {
+    module: "m2", part: "Stack Fundamentals",
+    q: "Which ordering policy does a stack follow?",
+    options: ["FIFO (First-In, First-Out)", "LIFO (Last-In, First-Out)", "Round-Robin", "Sorted Ascending"],
+    correct: 1,
+    explain: "A stack inserts and removes at the top, so the last pushed element is the first popped (LIFO)."
+  },
+  {
+    module: "m2", part: "Stack Operations",
+    q: "What are the time complexities of push() and pop() in both fixed-capacity array and linked-list stacks?",
+    options: ["O(n) for both", "O(1) for both", "push is O(n), pop is O(1)", "push is O(1), pop is O(n)"],
+    correct: 1,
+    explain: "Both array top-index updates and singly-linked head insertions/deletions execute in O(1) time."
+  },
+  {
+    module: "m2", part: "Stack Overflow",
+    q: "In an array stack of size MAX where `top` starts at -1, when does stack overflow happen?",
+    options: ["When top == -1", "When top == MAX - 1 and push() is called", "When top == 0", "Whenever peek() is called"],
+    correct: 1,
+    explain: "Valid indices are 0 through MAX - 1; pushing when top == MAX - 1 exceeds capacity and causes overflow."
+  },
+  {
+    module: "m2", part: "Stack Underflow",
+    q: "What condition triggers stack underflow?",
+    options: ["Pushing onto a full stack", "Popping when the stack has no elements (top == -1)", "Allocating dynamic memory", "Traversing from top to bottom"],
+    correct: 1,
+    explain: "Attempting to pop or remove from an empty stack (top == -1) causes stack underflow."
+  },
+  {
+    module: "m2", part: "Infix to Postfix",
+    q: "What is the postfix expression equivalent to infix `A + B * C`?",
+    options: ["A B + C *", "A B C * +", "* + A B C", "A + B C *"],
+    correct: 1,
+    explain: "Multiplication has higher precedence than addition, so B * C becomes B C *, and A + (B C *) becomes A B C * +."
+  },
+  {
+    module: "m2", part: "Infix to Postfix",
+    q: "What is the postfix expression for `(A + B) * (C - D)`?",
+    options: ["A B + C D - *", "A B C D + - *", "* + A B - C D", "A B + * C D -"],
+    correct: 0,
+    explain: "Parentheses evaluate first: (A + B) -> A B + and (C - D) -> C D -, then multiply -> A B + C D - *."
+  },
+  {
+    module: "m2", part: "Postfix Evaluation",
+    q: "During postfix evaluation with a stack, when an operator is read, what is the order of popping operands?",
+    options: ["Pop one operand only", "Pop top as right operand (op2), then next as left operand (op1)", "Pop bottom element first", "Clear the stack first"],
+    correct: 1,
+    explain: "Since operands were pushed left-to-right, the first popped value is the right operand (op2) and the second is op1 for non-commutative ops like - and /."
+  },
+  {
+    module: "m2", part: "Stack Applications",
+    q: "Which task naturally relies on stack (LIFO) behavior?",
+    options: ["Managing function calls/returns & recursion", "Printer job queue spooling", "BFS shortest-path level order", "First-come-first-served ticket line"],
+    correct: 0,
+    explain: "Nested function calls return in reverse order of invocation (LIFO), matching the call stack."
+  },
+  {
+    module: "m2", part: "Queue Fundamentals",
+    q: "Which ordering rule defines a standard queue?",
+    options: ["LIFO", "FIFO (First-In, First-Out)", "Highest key first", "Reverse LIFO"],
+    correct: 1,
+    explain: "A queue enqueues at the rear and dequeues from the front, following First-In, First-Out (FIFO)."
+  },
+  {
+    module: "m2", part: "Linear Array Queue",
+    q: "What limitation affects a simple linear array queue after repeated enqueue and dequeue operations?",
+    options: ["It cannot store numbers", "rear can hit MAX - 1 while front slots freed by dequeue remain unused", "Dequeue takes O(n) always", "It requires two pointers per element"],
+    correct: 1,
+    explain: "In a naive linear array queue, front advances forward and leaves empty slots behind it that cannot be reused once rear reaches MAX - 1."
+  },
+  {
+    module: "m2", part: "Circular Queue",
+    q: "In a circular queue of capacity N (0-indexed), how is `rear` updated so it wraps around to 0?",
+    options: ["rear = rear + 1", "rear = (rear + 1) % N", "rear = (rear - 1) % N", "rear = N / (rear + 1)"],
+    correct: 1,
+    explain: "Modulo arithmetic (rear + 1) % N wraps index N - 1 back to 0, reusing freed front slots."
+  },
+  {
+    module: "m2", part: "Deque",
+    q: "What operations does a Double-Ended Queue (Deque) support?",
+    options: ["Insertion and deletion at both front and rear", "Only push and pop at one end", "Only sorted insertion", "Random access by key only"],
+    correct: 0,
+    explain: "A deque allows inserting and deleting elements at both the front and rear ends."
+  },
+  {
+    module: "m2", part: "Priority Queue",
+    q: "In a min-priority queue, which item is removed first upon dequeue?",
+    options: ["Most recently inserted item", "Item with the minimum priority/key value", "Middle element", "Oldest item ignoring priority"],
+    correct: 1,
+    explain: "A min-priority queue always dequeues the element with the smallest priority value first."
+  },
     let score = 0;
     const answeredMap = new Map();
 
