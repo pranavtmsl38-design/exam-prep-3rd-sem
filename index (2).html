@@ -1,0 +1,2116 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3rd Sem Exam Prep LMS | MAKAUT B.Tech ECE</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              200: '#bfdbfe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+              950: '#0f172a'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.03); }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 9999px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.6); }
+    .flashcard { perspective: 1000px; }
+    .flashcard-inner { transition: transform 0.6s; transform-style: preserve-3d; }
+    .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+    .flashcard-front, .flashcard-back { backface-visibility: hidden; }
+    .flashcard-back { transform: rotateY(180deg); }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200">
+
+  <!-- Toast Notification Overlay -->
+  <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+  <!-- Confirmation Modal -->
+  <div id="confirmModal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 max-w-md w-full shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+      <div class="flex items-center gap-3 text-amber-500 mb-3">
+        <div class="w-10 h-10 rounded-2xl bg-amber-500/10 flex items-center justify-center shrink-0">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        </div>
+        <div>
+          <h3 id="confirmTitle" class="text-base font-bold text-slate-900 dark:text-white">Confirm Action</h3>
+          <p id="confirmMsg" class="text-xs text-slate-500 dark:text-slate-400">Are you sure you want to proceed?</p>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-4">
+        <button id="confirmCancelBtn" class="px-4 py-2 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Cancel</button>
+        <button id="confirmOkBtn" class="px-4 py-2 text-xs font-semibold rounded-xl bg-rose-600 text-white hover:bg-rose-700 transition shadow-lg shadow-rose-600/20">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Search Modal (Ctrl+K) -->
+  <div id="searchModal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-start justify-center pt-16 p-4 hidden">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-2xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+      <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
+        <svg class="w-5 h-5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input type="text" id="globalSearchInput" placeholder="Search syllabus, formulas, notes, or resources..." class="w-full bg-transparent border-none outline-none text-slate-900 dark:text-white placeholder-slate-400 text-sm">
+        <button id="closeSearchBtn" class="text-xs bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg text-slate-500 font-semibold">ESC</button>
+      </div>
+      <div id="searchResults" class="p-4 overflow-y-auto custom-scrollbar flex-1 space-y-2">
+        <p class="text-xs text-slate-400 text-center py-8">Type keywords above to instantly query across all 7 subjects, personal notes, and study links.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Share Progress Summary Card Modal -->
+  <div id="shareProgressModal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+        <h3 class="text-base font-bold text-slate-900 dark:text-white">Share Preparation Summary</h3>
+        <button onclick="closeModal('shareProgressModal')" class="text-slate-400 hover:text-slate-600">✕</button>
+      </div>
+      <div id="shareCardPreview" class="bg-gradient-to-br from-brand-900 via-brand-800 to-indigo-950 p-6 rounded-2xl text-white space-y-4 shadow-xl">
+        <div class="flex justify-between items-start">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-widest text-brand-300">MAKAUT B.Tech ECE 3rd Sem</span>
+            <h4 class="text-lg font-black" id="shareStudentName">Student Name</h4>
+            <p class="text-xs text-slate-300" id="shareCollege">College / Institution</p>
+          </div>
+          <div class="w-12 h-12 bg-white/10 backdrop-blur rounded-2xl flex items-center justify-center text-xl font-bold border border-white/20">3rd</div>
+        </div>
+        <div class="grid grid-cols-3 gap-2 pt-2 border-t border-white/10 text-center">
+          <div class="bg-white/5 p-2 rounded-xl">
+            <span class="block text-[10px] text-slate-300">Syllabus</span>
+            <span class="text-sm font-black text-brand-300" id="shareSyllabusPct">0%</span>
+          </div>
+          <div class="bg-white/5 p-2 rounded-xl">
+            <span class="block text-[10px] text-slate-300">Streak</span>
+            <span class="text-sm font-black text-amber-400" id="shareStreak">0 Days</span>
+          </div>
+          <div class="bg-white/5 p-2 rounded-xl">
+            <span class="block text-[10px] text-slate-300">Target CGPA</span>
+            <span class="text-sm font-black text-emerald-400" id="shareTargetCgpa">8.5</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex gap-2 justify-end">
+        <button onclick="copyShareText()" class="w-full bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow">Copy Card Summary Text</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Custom Question Modal -->
+  <div id="addQuestionModal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+      <h3 class="text-base font-bold text-slate-900 dark:text-white mb-4">Add Custom Practice Question</h3>
+      <form id="addQuestionForm" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold uppercase text-slate-400 mb-1">Subject</label>
+          <select id="qSubject" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-brand-500" required></select>
+        </div>
+        <div>
+          <label class="block font-semibold uppercase text-slate-400 mb-1">Question Text</label>
+          <textarea id="qText" rows="2" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl p-3 outline-none focus:ring-2 focus:ring-brand-500" placeholder="Enter problem statement..." required></textarea>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-slate-400 mb-1">Option A</label>
+            <input type="text" id="qOptA" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 outline-none" required>
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Option B</label>
+            <input type="text" id="qOptB" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 outline-none" required>
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Option C</label>
+            <input type="text" id="qOptC" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 outline-none" required>
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Option D</label>
+            <input type="text" id="qOptD" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 outline-none" required>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-semibold uppercase text-slate-400 mb-1">Correct Option</label>
+            <select id="qCorrect" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 outline-none" required>
+              <option value="0">Option A</option>
+              <option value="1">Option B</option>
+              <option value="2">Option C</option>
+              <option value="3">Option D</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold uppercase text-slate-400 mb-1">Difficulty</label>
+            <select id="qDiff" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 outline-none" required>
+              <option value="Easy">Easy</option>
+              <option value="Medium">Medium</option>
+              <option value="Hard">Hard</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block font-semibold uppercase text-slate-400 mb-1">Explanation</label>
+          <textarea id="qExplanation" rows="2" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl p-3 outline-none" placeholder="Detailed step-by-step solution..." required></textarea>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeModal('addQuestionModal')" class="px-4 py-2 font-medium rounded-xl border border-slate-300 dark:border-slate-700">Cancel</button>
+          <button type="submit" class="px-4 py-2 font-semibold rounded-xl bg-brand-600 text-white hover:bg-brand-700 transition">Save Question</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Resource Link Modal -->
+  <div id="addResourceModal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 max-w-lg w-full shadow-2xl">
+      <h3 class="text-base font-bold text-slate-900 dark:text-white mb-4">Add Custom Resource Link</h3>
+      <form id="addResourceForm" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold uppercase text-slate-400 mb-1">Resource Title</label>
+          <input type="text" id="resTitle" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-brand-500" placeholder="e.g. NPTEL Signals & Systems Module 1 Notes" required>
+        </div>
+        <div>
+          <label class="block font-semibold uppercase text-slate-400 mb-1">URL Link</label>
+          <input type="url" id="resUrl" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-brand-500" placeholder="https://..." required>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-semibold uppercase text-slate-400 mb-1">Subject</label>
+            <select id="resSubject" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 outline-none" required></select>
+          </div>
+          <div>
+            <label class="block font-semibold uppercase text-slate-400 mb-1">Category</label>
+            <select id="resType" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 outline-none" required>
+              <option value="notes">Notes / PDF</option>
+              <option value="pyq">PYQ Solution</option>
+              <option value="video">Video Lecture</option>
+              <option value="book">Reference Book</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeModal('addResourceModal')" class="px-4 py-2 font-medium rounded-xl border border-slate-300 dark:border-slate-700">Cancel</button>
+          <button type="submit" class="px-4 py-2 font-semibold rounded-xl bg-brand-600 text-white hover:bg-brand-700 transition">Save Resource</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- AUTH SECTION (Displayed when not logged in) -->
+  <div id="authSection" class="min-h-screen bg-slate-950 text-white flex flex-col justify-center items-center p-4">
+    <div class="mb-6 max-w-md w-full bg-brand-500/10 border border-brand-500/30 text-brand-300 p-3.5 rounded-2xl text-xs flex items-center gap-3 shadow-lg">
+      <svg class="w-5 h-5 shrink-0 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <span><strong>Demo Mode Notice:</strong> Browser-based localStorage authentication. Ready for easy REST/Firebase backend integration.</span>
+    </div>
+
+    <div class="max-w-md w-full bg-slate-900/90 backdrop-blur border border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6">
+      <div class="flex items-center justify-center gap-3">
+        <div class="w-12 h-12 bg-gradient-to-tr from-brand-600 via-indigo-600 to-emerald-500 rounded-2xl flex items-center justify-center font-black text-2xl shadow-lg text-white">3rd</div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight">MAKAUT ECE Prep</h1>
+          <p class="text-xs text-slate-400">B.Tech 3rd Semester Exam LMS</p>
+        </div>
+      </div>
+
+      <!-- Auth Tabs -->
+      <div class="flex bg-slate-950 p-1 rounded-2xl border border-slate-800 text-xs font-semibold">
+        <button id="tabLoginBtn" class="flex-1 py-2.5 rounded-xl transition bg-brand-600 text-white shadow">Log In</button>
+        <button id="tabSignupBtn" class="flex-1 py-2.5 rounded-xl transition text-slate-400 hover:text-white">Register Student</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-400 uppercase mb-1">Email or Roll No.</label>
+          <input type="text" id="loginEmail" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-500 outline-none focus:border-brand-500" placeholder="student@makaut.ac.in" required>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-400 uppercase mb-1">Password</label>
+          <input type="password" id="loginPass" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-500 outline-none focus:border-brand-500" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="w-full bg-brand-600 hover:bg-brand-500 font-bold py-3.5 rounded-xl transition shadow-lg shadow-brand-600/30 text-sm">Sign In to Dashboard</button>
+      </form>
+
+      <!-- Signup Form -->
+      <form id="signupForm" class="space-y-3 text-xs hidden">
+        <div>
+          <label class="block font-semibold text-slate-400 uppercase mb-1">Full Name</label>
+          <input type="text" id="regName" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-white outline-none focus:border-brand-500" placeholder="Ananya Roy" required>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-400 uppercase mb-1">College Name</label>
+          <input type="text" id="regCollege" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-white outline-none focus:border-brand-500" placeholder="e.g. Heritage Institute of Technology" required>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-400 uppercase mb-1">Email</label>
+          <input type="email" id="regEmail" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-white outline-none focus:border-brand-500" placeholder="ananya@makaut.ac.in" required>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-semibold text-slate-400 uppercase mb-1">Roll / Reg No</label>
+            <input type="text" id="regRoll" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none" placeholder="10900122045">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-400 uppercase mb-1">Target CGPA</label>
+            <input type="number" step="0.1" id="regCgpa" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none" placeholder="8.5" value="8.5">
+          </div>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-400 uppercase mb-1">Password</label>
+          <input type="password" id="regPass" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-white outline-none" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 font-bold py-3.5 rounded-xl transition shadow-lg shadow-emerald-600/30 text-sm">Create Account</button>
+      </form>
+
+      <!-- Quick Demo Access -->
+      <div class="pt-4 border-t border-slate-800 text-center">
+        <button id="quickDemoBtn" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
+          <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          One-Click Guest Demo Login
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APPLICATION SHELL -->
+  <div id="mainApp" class="flex-1 flex flex-col hidden">
+    <!-- Top Header Bar -->
+    <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <button id="mobileNavToggle" class="lg:hidden text-slate-600 dark:text-slate-300 p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+          <div class="flex items-center gap-2.5 cursor-pointer" onclick="navigate('dashboard')">
+            <div class="w-9 h-9 bg-gradient-to-tr from-brand-600 to-indigo-600 rounded-xl flex items-center justify-center font-extrabold text-white shadow-md text-sm">3rd</div>
+            <div class="hidden sm:block">
+              <span class="font-black text-slate-900 dark:text-white tracking-tight">3rd Sem ECE LMS</span>
+              <span class="text-[10px] block text-brand-600 font-bold uppercase tracking-wider">MAKAUT B.Tech Hub</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Global Search Bar Button -->
+        <div class="flex-1 max-w-md mx-2">
+          <button id="openSearchBtn" class="w-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 text-xs px-3.5 py-2 rounded-xl flex items-center justify-between border border-transparent transition">
+            <span class="flex items-center gap-2 truncate">
+              <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+              <span class="truncate">Search 7 subjects, formulas, notes...</span>
+            </span>
+            <kbd class="hidden md:inline-block bg-white dark:bg-slate-900 text-slate-500 text-[10px] px-2 py-0.5 rounded shadow-sm border border-slate-200 dark:border-slate-700 font-mono">Ctrl+K</kbd>
+          </button>
+        </div>
+
+        <!-- Right Header Utility Controls -->
+        <div class="flex items-center gap-2">
+          <!-- Streak Badge -->
+          <div class="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-600 dark:text-amber-400 text-xs font-bold" title="Current Daily Study Streak">
+            <svg class="w-4 h-4 fill-amber-500 text-amber-500" viewBox="0 0 24 24"><path d="M12 23c6.075 0 11-4.925 11-11 0-4.04-2.181-7.57-5.437-9.475-.386-.226-.88-.027-.996.4-.336 1.23-.974 2.378-1.874 3.278-1.562 1.562-3.805 2.115-5.836 1.488a.855.855 0 0 0-.96.425C6.732 10.375 6 12.607 6 15c0 3.866 3.134 7 7 7z"/></svg>
+            <span id="headerStreakText">0 Days</span>
+          </div>
+
+          <!-- Theme Toggle -->
+          <button id="themeToggle" class="p-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="Toggle Light/Dark Theme">
+            <svg id="sunIcon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            <svg id="moonIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+          </button>
+
+          <!-- Profile Navigation Button -->
+          <button onclick="navigate('profile')" class="flex items-center gap-2 p-1 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+            <div class="w-8 h-8 rounded-xl bg-brand-100 text-brand-700 font-extrabold flex items-center justify-center text-xs border border-brand-200" id="headerAvatar">ST</div>
+            <span class="text-xs font-bold text-slate-700 dark:text-slate-200 hidden md:inline-block" id="headerName">Student</span>
+          </button>
+
+          <!-- Logout Button -->
+          <button id="logoutBtn" class="p-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition" title="Log Out">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Academic Curriculum Notice Ribbon -->
+    <div class="bg-gradient-to-r from-brand-900 via-indigo-900 to-slate-900 text-white text-xs py-2 px-4 text-center flex items-center justify-center gap-2 border-b border-brand-800">
+      <span class="bg-amber-400 text-slate-950 px-2 py-0.5 rounded-lg font-black uppercase text-[10px]">Curriculum Notice</span>
+      <span>MAKAUT R23 / NEP-2020 Aligned Reference Syllabus — Verify latest batch circulars at <a href="https://makautwb.ac.in/" target="_blank" class="underline font-bold hover:text-brand-300">makautwb.ac.in</a></span>
+    </div>
+
+    <!-- MAIN BODY LAYOUT -->
+    <div class="flex-1 flex max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 gap-6">
+      <!-- Sidebar Navigation -->
+      <aside id="sidebar" class="w-64 shrink-0 hidden lg:block bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 shadow-sm h-fit sticky top-24 space-y-6">
+        <nav class="space-y-1" id="navLinksContainer"></nav>
+
+        <!-- Floating Pomodoro Focus Timer Card -->
+        <div class="pt-4 border-t border-slate-200 dark:border-slate-800">
+          <div class="bg-gradient-to-br from-brand-50 to-indigo-50 dark:from-slate-800 dark:to-slate-800/80 p-4 rounded-2xl border border-brand-100 dark:border-slate-700 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-brand-900 dark:text-brand-300 uppercase tracking-wider flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Focus Timer
+              </span>
+              <span id="pomoModeTag" class="text-[10px] bg-brand-600 text-white font-bold px-2 py-0.5 rounded">25m Work</span>
+            </div>
+
+            <div class="text-center font-black text-3xl tracking-tight text-slate-900 dark:text-white font-mono" id="pomoTimeDisplay">25:00</div>
+
+            <div class="flex gap-1.5">
+              <button id="pomoStartBtn" onclick="togglePomodoro()" class="flex-1 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold py-2 rounded-xl transition shadow">Start</button>
+              <button onclick="resetPomodoro()" class="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold px-3 py-2 rounded-xl">Reset</button>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Dynamic Views Container -->
+      <main class="flex-1 min-w-0">
+
+        <!-- DASHBOARD VIEW -->
+        <section id="view-dashboard" class="space-y-6">
+          <!-- Hero Banner -->
+          <div class="bg-gradient-to-r from-slate-900 via-brand-900 to-indigo-950 rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-2xl">
+            <div class="relative z-10 space-y-3">
+              <div class="flex items-center gap-2">
+                <span class="inline-block px-3 py-1 bg-white/10 backdrop-blur rounded-full text-xs font-bold text-brand-200">B.Tech Electronics & Communication Engg.</span>
+                <span class="text-xs text-amber-400 font-bold" id="dashBatchText">Batch 2024-2028</span>
+              </div>
+              <h2 class="text-2xl sm:text-3xl font-black tracking-tight" id="dashGreeting">Welcome Back!</h2>
+              <p class="text-slate-300 text-xs sm:text-sm max-w-xl">Master all 7 core MAKAUT 3rd Semester subjects. Track unit-wise completion, take timed exam simulations, and boost your CGPA.</p>
+              
+              <div class="pt-2 flex flex-wrap gap-3">
+                <button onclick="navigate('subjects')" class="bg-white text-slate-900 font-bold px-4 py-2.5 rounded-xl text-xs hover:bg-brand-50 transition shadow">Explore Syllabus</button>
+                <button onclick="navigate('simulator')" class="bg-brand-600 hover:bg-brand-500 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition shadow border border-brand-400/30">Launch Exam Simulator</button>
+                <button onclick="openShareProgressModal()" class="bg-white/10 hover:bg-white/20 text-white font-semibold px-4 py-2.5 rounded-xl text-xs backdrop-blur transition">Share Progress Card</button>
+              </div>
+            </div>
+            <div class="absolute -right-12 -bottom-12 w-64 h-64 bg-brand-500/20 rounded-full blur-3xl pointer-events-none"></div>
+          </div>
+
+          <!-- KPI Cards Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+              <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Total ECE Subjects</span>
+              <div class="text-2xl font-black text-slate-900 dark:text-white mt-1">7</div>
+              <span class="text-[11px] text-emerald-500 font-bold">100% Verified</span>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+              <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Syllabus Topics</span>
+              <div class="text-2xl font-black text-slate-900 dark:text-white mt-1" id="dashTotalTopics">0</div>
+              <span class="text-[11px] text-slate-400" id="dashPendingTopics">0 Pending</span>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+              <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Completed Topics</span>
+              <div class="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1" id="dashCompletedTopics">0</div>
+              <span class="text-[11px] text-brand-600 font-bold" id="dashOverallPct">0% Mastery</span>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+              <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Study Streak</span>
+              <div class="text-2xl font-black text-amber-500 mt-1" id="dashStreakValue">0 Days</div>
+              <span class="text-[11px] text-amber-600 font-bold">Keep it up!</span>
+            </div>
+          </div>
+
+          <!-- Subject Mastery Grid & Task Sidebar -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Subject Cards Grid (2 Cols) -->
+            <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+              <div class="flex items-center justify-between">
+                <h3 class="font-bold text-slate-900 dark:text-white text-base">Subject Mastery Progress</h3>
+                <button onclick="navigate('subjects')" class="text-xs font-bold text-brand-600 hover:underline">Full Syllabus →</button>
+              </div>
+              <div class="space-y-3" id="dashSubjectProgressList"></div>
+            </div>
+
+            <!-- Quick Widgets -->
+            <div class="space-y-6">
+              <!-- Today's Tasks Widget -->
+              <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                <div class="flex items-center justify-between">
+                  <h3 class="font-bold text-slate-900 dark:text-white text-sm">Today's Study Plan</h3>
+                  <button onclick="navigate('planner')" class="text-xs text-brand-600 font-bold">+ Add Task</button>
+                </div>
+                <div id="dashTodayTasks" class="space-y-2 text-xs"></div>
+              </div>
+
+              <!-- Quick Flashcard Preview Widget -->
+              <div class="bg-gradient-to-br from-indigo-900 to-slate-900 rounded-3xl p-6 text-white space-y-3 shadow-lg">
+                <div class="flex justify-between items-center text-xs">
+                  <span class="font-bold uppercase tracking-wider text-indigo-300">Quick Formula Flashcard</span>
+                  <button onclick="navigate('flashcards')" class="text-[10px] bg-white/10 px-2 py-0.5 rounded hover:bg-white/20">All Cards →</button>
+                </div>
+                <div id="dashFlashcardContent" class="text-xs font-semibold space-y-1">
+                  <div class="text-amber-300">Signal & Systems</div>
+                  <p class="text-slate-200">Continuous Convolution: y(t) = ∫ x(τ) h(t - τ) dτ</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SUBJECTS VIEW -->
+        <section id="view-subjects" class="space-y-6 hidden">
+          <!-- Horizontal Subject Nav Tabs -->
+          <div class="flex gap-2 overflow-x-auto pb-2 custom-scrollbar" id="subjectTabButtons"></div>
+
+          <!-- Active Subject Header Card -->
+          <div id="activeSubjectCard" class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm"></div>
+
+          <!-- Subject Detailed Subtabs -->
+          <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+            <div class="border-b border-slate-200 dark:border-slate-800 flex overflow-x-auto text-xs font-bold bg-slate-50/50 dark:bg-slate-900/50">
+              <button onclick="switchSubTab('syllabus')" id="subTab-syllabus" class="subtab-btn px-5 py-3.5 border-b-2 border-brand-600 text-brand-600">Syllabus Modules</button>
+              <button onclick="switchSubTab('notes')" id="subTab-notes" class="subtab-btn px-5 py-3.5 text-slate-500 border-b-2 border-transparent">Formulas & Notes</button>
+              <button onclick="switchSubTab('important')" id="subTab-important" class="subtab-btn px-5 py-3.5 text-slate-500 border-b-2 border-transparent">Key Exam Topics</button>
+              <button onclick="switchSubTab('pyq')" id="subTab-pyq" class="subtab-btn px-5 py-3.5 text-slate-500 border-b-2 border-transparent">PYQs & Solutions</button>
+              <button onclick="switchSubTab('resources')" id="subTab-resources" class="subtab-btn px-5 py-3.5 text-slate-500 border-b-2 border-transparent">Standard Textbooks & Lectures</button>
+            </div>
+
+            <div class="p-6">
+              <div id="subTabContent-syllabus" class="subtab-content space-y-4"></div>
+              <div id="subTabContent-notes" class="subtab-content hidden space-y-4"></div>
+              <div id="subTabContent-important" class="subtab-content hidden space-y-4"></div>
+              <div id="subTabContent-pyq" class="subtab-content hidden space-y-4"></div>
+              <div id="subTabContent-resources" class="subtab-content hidden space-y-4"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- EXAM SIMULATOR & MCQ PRACTICE VIEW -->
+        <section id="view-simulator" class="space-y-6 hidden">
+          <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
+              <div>
+                <h2 class="text-xl font-bold text-slate-900 dark:text-white">Exam Simulator & Quiz Engine</h2>
+                <p class="text-xs text-slate-500">25+ MAKAUT pattern questions across all 7 ECE subjects.</p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button onclick="openModal('addQuestionModal')" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold px-3 py-2 rounded-xl hover:bg-slate-200 transition">+ Custom Question</button>
+                <button id="startSimulatorBtn" onclick="startExamSimulator()" class="bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow">Launch 20-Min Full Exam Simulation</button>
+              </div>
+            </div>
+
+            <!-- Subject & Difficulty Filters for Quick Quiz -->
+            <div id="quizFilterBox" class="flex flex-wrap items-center gap-4 bg-slate-50 dark:bg-slate-800/40 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 text-xs">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-500 uppercase">Subject:</span>
+                <select id="quizSubjectSelect" onchange="loadQuizForSubject()" class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-1.5 font-semibold outline-none"></select>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-500 uppercase">Difficulty:</span>
+                <select id="quizDiffSelect" onchange="loadQuizForSubject()" class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-1.5 font-semibold outline-none">
+                  <option value="all">All Difficulties</option>
+                  <option value="Easy">Easy</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Hard">Hard</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Exam Simulator Interactive Bar (Timer & Palette Toggle) -->
+            <div id="simHeaderBar" class="hidden bg-slate-900 text-white p-4 rounded-2xl flex flex-wrap justify-between items-center gap-3">
+              <div class="flex items-center gap-3">
+                <span class="bg-brand-600 px-3 py-1 rounded-xl text-xs font-bold uppercase tracking-wider">Exam Simulator Mode</span>
+                <span class="text-xs text-slate-300" id="simQuestionTracker">Question 1 of 10</span>
+              </div>
+              <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 text-amber-400 font-mono font-bold text-sm">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <span id="simTimerText">20:00</span>
+                </div>
+                <button onclick="finishExamSimulator()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition">Submit Test Now</button>
+              </div>
+            </div>
+
+            <!-- Questions Container -->
+            <div id="quizContainer" class="space-y-6"></div>
+
+            <!-- Results Summary Box -->
+            <div id="quizResultBox" class="hidden text-center py-8 space-y-4">
+              <div class="w-24 h-24 mx-auto bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 rounded-full flex items-center justify-center text-3xl font-black shadow-inner" id="resultPctCircle">0%</div>
+              <h3 class="text-xl font-bold text-slate-900 dark:text-white" id="resultTitle">Test Completed!</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto" id="resultSubtitle">Score breakdown will appear here.</p>
+              <button onclick="resetQuiz()" class="bg-brand-600 text-white text-xs font-bold px-6 py-2.5 rounded-xl hover:bg-brand-700 transition">Try Another Quiz</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- FLASHCARDS VIEW -->
+        <section id="view-flashcards" class="space-y-6 hidden">
+          <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              <div>
+                <h2 class="text-xl font-bold text-slate-900 dark:text-white">Revision Flashcards</h2>
+                <p class="text-xs text-slate-500">Click any card to flip and review definitions, formulas, and theorems.</p>
+              </div>
+              <select id="flashcardSubjectSelect" onchange="renderFlashcards()" class="bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs font-semibold outline-none"></select>
+            </div>
+
+            <div id="flashcardsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+          </div>
+        </section>
+
+        <!-- STUDY PLANNER & KANBAN VIEW -->
+        <section id="view-planner" class="space-y-6 hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Add Task Form -->
+            <div class="space-y-6">
+              <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                <h3 class="font-bold text-slate-900 dark:text-white text-base">Create Study Task</h3>
+                <form id="addTaskForm" class="space-y-3 text-xs">
+                  <div>
+                    <label class="block font-semibold uppercase text-slate-400 mb-1">Task Description</label>
+                    <input type="text" id="taskTitle" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-brand-500" placeholder="e.g. Solve 5 Previous Year Network Theory problems" required>
+                  </div>
+                  <div>
+                    <label class="block font-semibold uppercase text-slate-400 mb-1">Subject Tag</label>
+                    <select id="taskSubject" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-brand-500" required></select>
+                  </div>
+                  <div class="grid grid-cols-2 gap-2">
+                    <div>
+                      <label class="block font-semibold uppercase text-slate-400 mb-1">Target Date</label>
+                      <input type="date" id="taskDate" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 outline-none" required>
+                    </div>
+                    <div>
+                      <label class="block font-semibold uppercase text-slate-400 mb-1">Priority</label>
+                      <select id="taskPriority" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 outline-none">
+                        <option value="Normal">Normal</option>
+                        <option value="High">High</option>
+                      </select>
+                    </div>
+                  </div>
+                  <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 rounded-xl transition shadow">+ Save Task</button>
+                </form>
+              </div>
+            </div>
+
+            <!-- Task List Kanban / Board -->
+            <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col space-y-4">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-slate-200 dark:border-slate-800">
+                <h3 class="font-bold text-slate-900 dark:text-white text-base">Planner Tasks</h3>
+                <div class="flex gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-semibold">
+                  <button onclick="filterTasks('all')" id="taskFilter-all" class="task-filter-btn px-3 py-1 rounded-lg bg-white dark:bg-slate-700 shadow text-slate-900 dark:text-white">All</button>
+                  <button onclick="filterTasks('pending')" id="taskFilter-pending" class="task-filter-btn px-3 py-1 rounded-lg text-slate-500">Pending</button>
+                  <button onclick="filterTasks('completed')" id="taskFilter-completed" class="task-filter-btn px-3 py-1 rounded-lg text-slate-500">Completed</button>
+                </div>
+              </div>
+              <div id="taskList" class="space-y-2.5 flex-1 overflow-y-auto custom-scrollbar max-h-[500px]"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- NOTES & BOOKMARKS VIEW -->
+        <section id="view-notes" class="space-y-6 hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Notes Vault -->
+            <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+              <div class="flex justify-between items-center">
+                <h2 class="text-lg font-bold text-slate-900 dark:text-white">Personal Notes Vault</h2>
+                <button onclick="openNoteForm()" class="bg-brand-600 text-white text-xs font-bold px-3.5 py-2 rounded-xl hover:bg-brand-700 transition">+ New Note</button>
+              </div>
+
+              <!-- Note Form Modal/Container -->
+              <div id="noteFormContainer" class="hidden bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3 text-xs">
+                <input type="text" id="noteTitle" placeholder="Note Title (e.g. Complete Fourier Series Formulas)" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-brand-500">
+                <select id="noteSubject" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 outline-none"></select>
+                <textarea id="noteContent" rows="4" placeholder="Type key derivations, formulas, or teacher hints..." class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl p-3 outline-none focus:ring-2 focus:ring-brand-500"></textarea>
+                <div class="flex justify-end gap-2">
+                  <button onclick="closeNoteForm()" class="px-3 py-1.5 font-medium border border-slate-300 dark:border-slate-700 rounded-xl">Cancel</button>
+                  <button onclick="saveNote()" class="px-3 py-1.5 font-bold bg-brand-600 text-white rounded-xl hover:bg-brand-700">Save Note</button>
+                </div>
+              </div>
+
+              <div id="notesContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+            </div>
+
+            <!-- Bookmarked Topics Sidebar -->
+            <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+              <h3 class="font-bold text-slate-900 dark:text-white text-base">Bookmarked Topics</h3>
+              <div id="bookmarksList" class="space-y-2 text-xs"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- STUDY RESOURCES VIEW -->
+        <section id="view-resources" class="space-y-6 hidden">
+          <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <h2 class="text-xl font-bold text-slate-900 dark:text-white">Curated Resource Vault</h2>
+                <p class="text-xs text-slate-500">Verified links to official portals, standard textbooks, and lecture notes.</p>
+              </div>
+              <button onclick="openModal('addResourceModal')" class="bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow">+ Add Link</button>
+            </div>
+
+            <!-- Official Links Banner -->
+            <div class="bg-gradient-to-r from-brand-50 to-indigo-50 dark:from-slate-800 dark:to-slate-800/50 p-4 rounded-2xl border border-brand-100 dark:border-slate-700 space-y-3">
+              <span class="text-xs font-bold uppercase text-brand-700 dark:text-brand-300 tracking-wider">Verified Official Portals</span>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <a href="https://makautwb.ac.in/" target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-between hover:border-brand-500 transition group">
+                  <div>
+                    <div class="font-bold text-slate-900 dark:text-white group-hover:text-brand-600">MAKAUT Official Portal</div>
+                    <div class="text-[10px] text-slate-400">makautwb.ac.in</div>
+                  </div>
+                  <svg class="w-4 h-4 text-slate-400 group-hover:text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                </a>
+                <a href="https://www.makaut.com/" target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-between hover:border-brand-500 transition group">
+                  <div>
+                    <div class="font-bold text-slate-900 dark:text-white group-hover:text-brand-600">MAKAUT PYQ Reference Archive</div>
+                    <div class="text-[10px] text-slate-400">makaut.com</div>
+                  </div>
+                  <svg class="w-4 h-4 text-slate-400 group-hover:text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                </a>
+              </div>
+            </div>
+
+            <!-- Subject-wise Resources Container -->
+            <div id="allResourcesContainer" class="space-y-4"></div>
+          </div>
+        </section>
+
+        <!-- PROGRESS ANALYTICS VIEW -->
+        <section id="view-analytics" class="space-y-6 hidden">
+          <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
+            <h2 class="text-xl font-bold text-slate-900 dark:text-white">Real-Time Progress Analytics</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Doughnut Chart Container -->
+              <div class="bg-slate-50 dark:bg-slate-800/40 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-4 flex flex-col items-center">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white self-start">Overall Syllabus Completion</h3>
+                <div class="w-56 h-56">
+                  <canvas id="chartDoughnut"></canvas>
+                </div>
+              </div>
+
+              <!-- Bar Chart Container -->
+              <div class="bg-slate-50 dark:bg-slate-800/40 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-4">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white">Subject Mastery (%)</h3>
+                <div class="h-56">
+                  <canvas id="chartBar"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Data Export / Restore Section -->
+            <div class="pt-6 border-t border-slate-200 dark:border-slate-800 space-y-3">
+              <h3 class="text-base font-bold text-slate-900 dark:text-white">Data Management & Backup</h3>
+              <p class="text-xs text-slate-500">Export your local study state to JSON or restore existing backups across devices.</p>
+              
+              <div class="flex flex-wrap gap-2 text-xs">
+                <button onclick="exportProgressJSON()" class="bg-slate-900 dark:bg-slate-100 dark:text-slate-900 text-white font-bold px-4 py-2.5 rounded-xl transition shadow flex items-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                  Export Data JSON
+                </button>
+                <label class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold px-4 py-2.5 rounded-xl hover:bg-slate-200 cursor-pointer transition flex items-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                  Restore JSON Backup
+                  <input type="file" id="importJsonInput" accept=".json" onchange="importProgressJSON(event)" class="hidden">
+                </label>
+                <button onclick="resetAllProgress()" class="bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 font-bold px-4 py-2.5 rounded-xl hover:bg-rose-100 transition">Reset All Demo Data</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- USER PROFILE VIEW -->
+        <section id="view-profile" class="space-y-6 hidden">
+          <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm max-w-2xl mx-auto space-y-6">
+            <h2 class="text-xl font-bold text-slate-900 dark:text-white">Student Profile Settings</h2>
+            
+            <form id="profileForm" class="space-y-4 text-xs">
+              <div>
+                <label class="block font-semibold uppercase text-slate-400 mb-1">Full Name</label>
+                <input type="text" id="profName" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-brand-500" required>
+              </div>
+              <div>
+                <label class="block font-semibold uppercase text-slate-400 mb-1">College Name</label>
+                <input type="text" id="profCollege" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-brand-500">
+              </div>
+              <div>
+                <label class="block font-semibold uppercase text-slate-400 mb-1">Email Address</label>
+                <input type="email" id="profEmail" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-brand-500" required>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block font-semibold uppercase text-slate-400 mb-1">Roll / Reg No.</label>
+                  <input type="text" id="profRoll" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 outline-none">
+                </div>
+                <div>
+                  <label class="block font-semibold uppercase text-slate-400 mb-1">Target CGPA</label>
+                  <input type="number" step="0.1" id="profCgpa" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 outline-none">
+                </div>
+              </div>
+              <button type="submit" class="bg-brand-600 hover:bg-brand-700 text-white font-bold px-6 py-2.5 rounded-xl transition shadow">Save Profile Changes</button>
+            </form>
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+    <!-- Mobile Bottom Navigation Bar -->
+    <nav class="lg:hidden bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 fixed bottom-0 left-0 right-0 z-40 px-2 py-2 flex justify-around items-center text-[10px] font-semibold text-slate-500 dark:text-slate-400" id="mobileBottomNav"></nav>
+  </div>
+
+  <!-- APPLICATION CORE SCRIPT -->
+  <script>
+    // --- 1. ACADEMIC DATA (7 core subjects) ---
+    const SUBJECTS_DATA = [
+      {
+        id: 'dsa',
+        name: 'Data Structures & Algorithms',
+        code: 'ES-CS301',
+        credits: '3 Credits',
+        badge: 'MAKAUT R23 / NEP-2020 Aligned Reference',
+        units: [
+          { title: 'Unit 1: Stacks, Queues & Complexity', topics: ['Asymptotic Notation (Big-O, Omega, Theta)', 'Stack Operations & Array/Linked List Implementation', 'Infix to Postfix Conversion & Evaluation', 'Circular & Double-ended Queues (Deque)'] },
+          { title: 'Unit 2: Linked Lists', topics: ['Singly Linked List Operations (Insert, Delete, Reverse)', 'Doubly & Circular Linked Lists', 'Polynomial Representation and Addition', 'Dynamic Memory Allocation in C/C++'] },
+          { title: 'Unit 3: Trees & Binary Search Trees', topics: ['Binary Tree Properties & Array/Pointer Representation', 'Tree Traversals (Inorder, Preorder, Postorder)', 'Binary Search Tree (BST) Operations & Searching', 'AVL Trees: Rotations & Height Balancing', 'Binary Heaps & Heap Sort'] },
+          { title: 'Unit 4: Graph Algorithms', topics: ['Graph Representations (Adjacency Matrix & List)', 'Graph Traversals: BFS & DFS Analysis', 'Minimum Spanning Trees: Prim\'s & Kruskal\'s Algorithms', 'Single Source Shortest Path: Dijkstra\'s Algorithm'] },
+          { title: 'Unit 5: Searching, Sorting & Hashing', topics: ['Linear & Binary Search', 'Bubble, Insertion, Selection, Quick & Merge Sort', 'Hash Tables, Hash Functions & Collision Resolution (Chaining, Open Addressing)'] }
+        ],
+        notes: [
+          'Stack: LIFO structure. Applications: Call stack recursion, expression evaluation.',
+          'Queue: FIFO structure. Applications: CPU Scheduling, BFS Graph traversal.',
+          'BST Search: Average O(log n), Worst O(n) for skewed trees.',
+          'Dijkstra\'s algorithm fails for graphs with negative edge weights.'
+        ],
+        important: [
+          'Infix to Postfix Expression Conversion Algorithm',
+          'AVL Tree Single & Double Rotation Scenarios',
+          'Quick Sort Partitioning Scheme & Worst-case Proof',
+          'Comparison of Prim\'s vs Kruskal\'s MST Algorithms'
+        ],
+        pyqs: [
+          { q: 'Convert (A + B * C) / (D - E) to Postfix using Stack.', year: '2023' },
+          { q: 'Construct an AVL tree for numbers: 10, 20, 30, 40, 50, 25.', year: '2022' }
+        ],
+        resources: [
+          { title: 'Data Structures by Horowitz & Sahni', url: 'https://www.makaut.com/', type: 'book' },
+          { title: 'NPTEL Programming & Data Structures Video Lectures', url: 'https://nptel.ac.in/', type: 'video' }
+        ]
+      },
+      {
+        id: 'dsd',
+        name: 'Digital System Design',
+        code: 'EC302',
+        credits: '3 Credits',
+        badge: 'MAKAUT R23 / NEP-2020 Aligned Reference',
+        units: [
+          { title: 'Unit 1: Boolean Algebra & K-Maps', topics: ['Number Systems & Code Conversions (Binary, BCD, Gray)', 'Boolean Postulates, Duality & De Morgan\'s Theorems', 'K-Map Minimization up to 5 variables (SOP & POS)', 'Quine-McCluskey (Tabular) Minimization'] },
+          { title: 'Unit 2: Combinational Logic', topics: ['Adders, Subtractors & Carry Look-Ahead Adders', 'Multiplexers (MUX) & Demultiplexers (DEMUX)', 'Decoders, Encoders & Priority Encoders', 'Code Converters & Comparator Circuits'] },
+          { title: 'Unit 3: Sequential Logic & Flip-Flops', topics: ['Latches vs Flip-Flops: SR, JK, D, and T Flip-Flops', 'Master-Slave JK Flip-Flop & Race-Around Solution', 'Flip-Flop Characteristic Equations & Conversions'] },
+          { title: 'Unit 4: Registers & Counters', topics: ['Shift Registers (SISO, SIPO, PISO, PIPO, Universal)', 'Asynchronous (Ripple) Counters & MOD-N Design', 'Synchronous Counter Design using State Diagrams', 'Ring & Johnson Counters'] },
+          { title: 'Unit 5: Logic Families & Programmable Logic', topics: ['TTL & CMOS Logic Families: Parameters (VOH, VOL, Fan-out)', 'RAM, ROM, PLA, PAL & FPGA Architectures'] }
+        ],
+        notes: [
+          'De Morgan\'s Laws: (A + B)\' = A\' . B\' and (A . B)\' = A\' + B\'',
+          'Race-around condition occurs in JK Flip-Flop when J=1, K=1 and clock pulse width tp > propagation delay dt.'
+        ],
+        important: [
+          'K-Map 4-variable simplification with Don\'t Care terms',
+          'Design Full Adder using 8:1 MUX',
+          'Synchronous MOD-6 Counter Design using JK Flip-Flops'
+        ],
+        pyqs: [
+          { q: 'Design a 4-bit Binary-to-Gray code converter.', year: '2023' },
+          { q: 'Explain Master-Slave JK Flip-Flop circuit to overcome race-around.', year: '2022' }
+        ],
+        resources: [
+          { title: 'Digital Design by M. Morris Mano', url: 'https://www.makaut.com/', type: 'book' }
+        ]
+      },
+      {
+        id: 'ed',
+        name: 'Electronic Devices',
+        code: 'EC301',
+        credits: '3 Credits',
+        badge: 'MAKAUT R23 / NEP-2020 Aligned Reference',
+        units: [
+          { title: 'Unit 1: Semiconductor Physics', topics: ['Intrinsic & Extrinsic Semiconductors, Fermi-Dirac Distribution', 'Carrier Drift & Diffusion Currents, Einstein Relation', 'Continuity Equation & Hall Effect'] },
+          { title: 'Unit 2: PN Junction Diode & Applications', topics: ['Depletion Region, Built-in Potential Derivation & I-V Curve', 'Zener Diode & Avalanche Breakdown Mechanisms', 'Half-wave, Full-wave & Bridge Rectifiers with Filters', 'Clipper & Clamper Circuits'] },
+          { title: 'Unit 3: Bipolar Junction Transistor (BJT)', topics: ['BJT Construction & Modes (CB, CE, CC)', 'Transistor Characteristics & Current Gains (alpha, beta)', 'DC Load Line, Q-Point & Biasing Circuits (Voltage Divider)', 'Thermal Runaway & Stability Factor'] },
+          { title: 'Unit 4: Field Effect Transistors (FET & MOSFET)', topics: ['JFET Construction, Drain & Transfer Characteristics', 'MOSFETs: Enhancement & Depletion Mode (n-channel & p-channel)', 'MOS Capacitor Physics & CMOS Inverter Basics'] },
+          { title: 'Unit 5: Special Optoelectronic Devices', topics: ['Varactor, Tunnel Diode & Schottky Barrier Diode', 'LED, Photodiode, Solar Cell & Optocouplers'] }
+        ],
+        notes: [
+          'Built-in potential Vbi = (kT/q) * ln(Na*Nd / ni^2).',
+          'Voltage Divider Bias offers the lowest stability factor S, making it thermally stable.'
+        ],
+        important: [
+          'Derivation of Built-in Potential Vbi',
+          'BJT Collector Current IC Equation & Voltage Divider Stability Factor',
+          'Enhancement MOSFET Drain Current ID equation in Saturation'
+        ],
+        pyqs: [
+          { q: 'Derive the relationship between Alpha and Beta for BJT.', year: '2023' },
+          { q: 'Explain the working of n-channel Enhancement MOSFET with IV characteristics.', year: '2021' }
+        ],
+        resources: [
+          { title: 'Microelectronic Circuits by Sedra & Smith', url: 'https://www.makaut.com/', type: 'book' }
+        ]
+      },
+      {
+        id: 'evs',
+        name: 'Environmental Science',
+        code: 'MC381',
+        credits: 'Mandatory Non-Credit',
+        badge: 'MAKAUT R23 / NEP-2020 Aligned Reference',
+        units: [
+          { title: 'Unit 1: Ecosystems & Biodiversity', topics: ['Structure of Ecosystems, Food Chains & Food Webs', 'Energy Flow & Ecological Pyramids', 'Biodiversity Hotspots & Conservation (In-situ & Ex-situ)'] },
+          { title: 'Unit 2: Air & Water Pollution Control', topics: ['Air Pollutants (CO, SOx, NOx, PM2.5) & Smog Formation', 'Air Pollution Control Equipment: ESP & Cyclone Separators', 'Water Quality Parameters: DO, BOD, COD & Eutrophication', 'Sewage Treatment Plant (STP) Primary, Secondary & Tertiary Steps'] },
+          { title: 'Unit 3: Waste Management & E-Waste', topics: ['Municipal Solid Waste Segregation & Composting', 'E-Waste Management & Heavy Metal Hazards', 'Hazardous Waste Disposal Methods'] },
+          { title: 'Unit 4: Environmental Acts & EIA', topics: ['Environmental Protection Act 1986', 'Environmental Impact Assessment (EIA) Steps', 'Sustainable Development Goals (SDGs)'] }
+        ],
+        notes: [
+          'BOD measures organic matter oxygen demand; high BOD = polluted water.',
+          'ESP uses electrostatic force to remove fine fly ash particles from flue gases.'
+        ],
+        important: [
+          'Difference between BOD and COD',
+          'Working principle of Electrostatic Precipitators',
+          'Steps involved in Environmental Impact Assessment (EIA)'
+        ],
+        pyqs: [
+          { q: 'Describe the Activated Sludge Process in wastewater treatment.', year: '2022' }
+        ],
+        resources: [
+          { title: 'Environmental Studies by Erach Bharucha', url: 'https://makautwb.ac.in/', type: 'book' }
+        ]
+      },
+      {
+        id: 'math3',
+        name: 'Mathematics-III (Probability & Statistics)',
+        code: 'BS-M301',
+        credits: '3 Credits',
+        badge: 'MAKAUT R23 / NEP-2020 Aligned Reference',
+        units: [
+          { title: 'Unit 1: Basic Probability & Bayes Theorem', topics: ['Axioms of Probability, Conditional Probability', 'Bayes\' Theorem & Total Probability Rule', 'Random Variables, PMF, PDF & Cumulative Distribution Functions'] },
+          { title: 'Unit 2: Probability Distributions', topics: ['Binomial & Poisson Distributions (Mean & Variance)', 'Normal (Gaussian) Distribution & Standard Normal Curve', 'Exponential Distribution & Memoryless Property'] },
+          { title: 'Unit 3: Two-Dimensional Random Variables', topics: ['Joint PDF & Marginal/Conditional Distributions', 'Covariance & Karl Pearson Correlation Coefficient', 'Lines of Regression (Y on X, X on Y)'] },
+          { title: 'Unit 4: Hypothesis Testing & Sampling', topics: ['Sampling Distributions & Central Limit Theorem (CLT)', 'Large Sample Tests: Z-test for Mean and Proportions', 'Small Sample Tests: Student\'s t-test & Chi-Square Test'] }
+        ],
+        notes: [
+          'Normal Distribution: Bell-shaped curve; Mean = Median = Mode; Area under curve = 1.',
+          'Poisson Distribution: Limit of Binomial distribution when n -> ∞ and p -> 0.'
+        ],
+        important: [
+          'Numerical problems on Bayes\' Theorem',
+          'Proof of Mean and Variance of Poisson Distribution',
+          'Regression Lines and Z-test for Difference of Means'
+        ],
+        pyqs: [
+          { q: 'State and prove Bayes Theorem with a real-world example.', year: '2023' },
+          { q: 'Fit a Normal distribution to given experimental frequency data.', year: '2022' }
+        ],
+        resources: [
+          { title: 'Higher Engineering Mathematics by B.S. Grewal', url: 'https://www.makaut.com/', type: 'book' }
+        ]
+      },
+      {
+        id: 'nt',
+        name: 'Network Theory',
+        code: 'EC303',
+        credits: '3 Credits',
+        badge: 'MAKAUT R23 / NEP-2020 Aligned Reference',
+        units: [
+          { title: 'Unit 1: Network Theorems', topics: ['Mesh & Nodal Analysis with Dependent Sources', 'Thevenin\'s & Norton\'s Theorems', 'Superposition & Maximum Power Transfer Theorems', 'Reciprocity & Millman\'s Theorems'] },
+          { title: 'Unit 2: Transient Analysis', topics: ['Transient Response of RL, RC & RLC Circuits to DC Step Inputs', 'Initial and Final Value Conditions in R, L, C', 'Laplace Transform Method for Circuit Transients'] },
+          { title: 'Unit 3: Resonance & Coupled Circuits', topics: ['Series & Parallel Resonance, Resonant Frequency Derivations', 'Quality Factor (Q-factor), Bandwidth & Selectivity', 'Magnetically Coupled Circuits & Dot Convention'] },
+          { title: 'Unit 4: Two-Port Networks', topics: ['Z (Impedance) & Y (Admittance) Parameters', 'ABCD (Transmission) & Hybrid (h) Parameters', 'Interconnection of Two-Port Networks (Cascade, Series, Parallel)'] },
+          { title: 'Unit 5: Graph Theory & Filters', topics: ['Network Topology: Tree, Co-tree, Incidence & Tie-set Matrices', 'Constant-k Low Pass, High Pass & Band Pass Passive Filters'] }
+        ],
+        notes: [
+          'Maximum Power Transfer: ZL = Zth* (complex conjugate of Thevenin impedance).',
+          'Series Resonance: Impedance Z = R (minimum), current is maximum.'
+        ],
+        important: [
+          'Thevenin Equivalent circuit calculation with dependent sources',
+          'Transient response derivation for RLC series circuit',
+          'Conversion formulas between Z, Y, and ABCD parameters'
+        ],
+        pyqs: [
+          { q: 'Find the Thevenin equivalent across load terminals in a given circuit.', year: '2023' },
+          { q: 'Derive expressions for Z-parameters in terms of ABCD parameters.', year: '2022' }
+        ],
+        resources: [
+          { title: 'Network Analysis by M.E. Van Valkenburg', url: 'https://www.makaut.com/', type: 'book' }
+        ]
+      },
+      {
+        id: 'ss',
+        name: 'Signals & Systems',
+        code: 'EC304',
+        credits: '3 Credits',
+        badge: 'MAKAUT R23 / NEP-2020 Aligned Reference',
+        units: [
+          { title: 'Unit 1: Signal & System Classification', topics: ['Continuous & Discrete Time Signals (Unit Step, Impulse, Ramp)', 'Signal Energy vs Power, Even/Odd & Periodic Signals', 'System Properties: Linearity, Time-Invariance, Causality, Stability (BIBO)', 'Continuous & Discrete Convolution'] },
+          { title: 'Unit 2: Fourier Series', topics: ['Trigonometric & Exponential Fourier Series for CT Signals', 'Gibbs Phenomenon & Dirichlet Conditions', 'Discrete-Time Fourier Series (DTFS)'] },
+          { title: 'Unit 3: Continuous & Discrete Fourier Transforms', topics: ['Continuous-Time Fourier Transform (CTFT) & Inverse CTFT', 'Properties: Linearity, Shifting, Convolution, Parseval\'s Relation', 'Discrete-Time Fourier Transform (DTFT)'] },
+          { title: 'Unit 4: Laplace Transform Analysis', topics: ['Laplace Transform, Region of Convergence (ROC) & Properties', 'Inverse Laplace Transform using Partial Fraction Expansion', 'Transfer Function H(s) & Stability Analysis of Continuous LTI Systems'] },
+          { title: 'Unit 5: Z-Transform Analysis', topics: ['Z-Transform, ROC Properties for Discrete Signals', 'Inverse Z-Transform Techniques', 'System Function H(z) & Pole-Zero Stability Analysis'] }
+        ],
+        notes: [
+          'BIBO Stability: Impulse response h(t) must be absolutely integrable.',
+          'Convolution in time domain corresponds to multiplication in frequency domain.'
+        ],
+        important: [
+          'Properties of Convolution Integral',
+          'ROC properties for Laplace and Z-Transforms',
+          'Stability condition based on pole locations in s-plane and z-plane'
+        ],
+        pyqs: [
+          { q: 'Find the Convolution of two rectangular pulses of equal width.', year: '2023' },
+          { q: 'Determine the Z-transform and ROC of x(n) = a^n u(n).', year: '2022' }
+        ],
+        resources: [
+          { title: 'Signals and Systems by Oppenheim & Willsky', url: 'https://www.makaut.com/', type: 'book' }
+        ]
+      }
+    ];
+
+    // --- 2. MCQ QUESTION BANK (25+ Questions across 7 subjects) ---
+    const DEFAULT_MCQS = [
+      { subjectId: 'dsa', question: 'Which data structure works on the LIFO (Last In First Out) principle?', options: ['Queue', 'Stack', 'Array', 'Tree'], correct: 1, diff: 'Easy', explanation: 'Stack follows LIFO where elements are pushed and popped from the same top end.' },
+      { subjectId: 'dsa', question: 'What is the average case time complexity of Quick Sort algorithm?', options: ['O(n)', 'O(n log n)', 'O(n^2)', 'O(log n)'], correct: 1, diff: 'Easy', explanation: 'Quick Sort achieves O(n log n) average time complexity through divide and conquer.' },
+      { subjectId: 'dsa', question: 'Which graph traversal technique uses a Queue data structure?', options: ['Depth First Search (DFS)', 'Breadth First Search (BFS)', 'Preorder Traversal', 'Postorder Traversal'], correct: 1, diff: 'Medium', explanation: 'BFS uses a Queue to explore graph nodes level by level.' },
+      { subjectId: 'dsa', question: 'In a complete binary tree of height h, what is the maximum number of nodes?', options: ['2^h - 1', '2^(h+1) - 1', '2^h', '2h + 1'], correct: 1, diff: 'Medium', explanation: 'Max nodes in a binary tree of height h (root at level 0) is 2^(h+1) - 1.' },
+
+      { subjectId: 'dsd', question: 'How many select lines are needed for a 16:1 Multiplexer?', options: ['2', '4', '8', '16'], correct: 1, diff: 'Easy', explanation: 'For a 2^n to 1 MUX, n select lines are required. 2^4 = 16, so 4 select lines.' },
+      { subjectId: 'dsd', question: 'Which flip-flop suffers from the race-around condition when inputs are J=1, K=1?', options: ['SR Flip-Flop', 'D Flip-Flop', 'JK Flip-Flop', 'T Flip-Flop'], correct: 2, diff: 'Easy', explanation: 'JK Flip-Flop toggles rapidly when J=1, K=1 and clock pulse width > propagation delay.' },
+      { subjectId: 'dsd', question: 'How many Flip-Flops are required to construct a MOD-12 Counter?', options: ['3', '4', '5', '12'], correct: 1, diff: 'Medium', explanation: 'Since 2^3 = 8 < 12 and 2^4 = 16 >= 12, 4 flip-flops are needed.' },
+      { subjectId: 'dsd', question: 'The dual of expression A + (B . C) is given by:', options: ['A . (B + C)', 'A\' + (B\' . C\')', 'A . (B . C)', 'A + (B + C)'], correct: 0, diff: 'Medium', explanation: 'Duality replaces OR with AND and vice-versa, keeping variables unchanged.' },
+
+      { subjectId: 'ed', question: 'Under reverse bias, what happens to the depletion region width of a PN junction?', options: ['Narrows', 'Widens', 'Remains unchanged', 'Disappears'], correct: 1, diff: 'Easy', explanation: 'Reverse bias pulls majority carriers away from the junction, expanding the depletion region.' },
+      { subjectId: 'ed', question: 'The relationship between BJT current gains alpha and beta is:', options: ['beta = alpha / (1 - alpha)', 'alpha = beta / (1 - beta)', 'beta = alpha / (1 + alpha)', 'alpha = beta * (1 + beta)'], correct: 0, diff: 'Easy', explanation: 'BJT gain formula: beta = alpha / (1 - alpha).' },
+      { subjectId: 'ed', question: 'In an n-channel Enhancement MOSFET, current flow starts when gate-to-source voltage VGS is:', options: ['Greater than threshold voltage Vth', 'Less than zero', 'Zero', 'Equal to pinch-off voltage'], correct: 0, diff: 'Medium', explanation: 'Enhancement MOSFET creates an inversion channel only when VGS > Vth.' },
+      { subjectId: 'ed', question: 'Which diode operates based on quantum mechanical tunneling mechanism?', options: ['Zener Diode', 'Tunnel Diode', 'Photodiode', 'Varactor Diode'], correct: 1, diff: 'Hard', explanation: 'Tunnel diode is heavily doped, enabling carrier tunneling across thin barrier.' },
+
+      { subjectId: 'evs', question: 'Which parameter measures organic water pollution level?', options: ['pH value', 'Biochemical Oxygen Demand (BOD)', 'Turbidity', 'Hardness'], correct: 1, diff: 'Easy', explanation: 'High BOD indicates elevated microbial oxygen consumption due to organic waste.' },
+      { subjectId: 'evs', question: 'Electrostatic Precipitators (ESP) are primarily used to remove:', options: ['Sulfur Dioxide gas', 'Carbon Monoxide gas', 'Fine Particulate Matter (PM)', 'Noise Pollution'], correct: 2, diff: 'Medium', explanation: 'ESPs ionize fly ash particles using high voltage and collect them on electrodes.' },
+      { subjectId: 'evs', question: 'Which Environmental Act was enacted in India following the Bhopal Gas Tragedy?', options: ['Water Act 1974', 'Air Act 1981', 'Environment Protection Act 1986', 'Forest Act 1927'], correct: 2, diff: 'Medium', explanation: 'Environment Protection Act was passed in 1986 as an umbrella legislation.' },
+
+      { subjectId: 'math3', question: 'If P(A) = 0.4, P(B) = 0.5, and A & B are independent events, P(A ∩ B) is:', options: ['0.9', '0.2', '0.1', '0.0'], correct: 1, diff: 'Easy', explanation: 'For independent events, P(A ∩ B) = P(A) * P(B) = 0.4 * 0.5 = 0.2.' },
+      { subjectId: 'math3', question: 'For a Poisson distribution, if the mean is 4, what is its variance?', options: ['2', '4', '8', '16'], correct: 1, diff: 'Easy', explanation: 'In a Poisson distribution, Mean = Variance = lambda.' },
+      { subjectId: 'math3', question: 'What is the total area under a Standard Normal Distribution curve?', options: ['0.5', '1.0', '100', 'Infinity'], correct: 1, diff: 'Easy', explanation: 'The integral of a standard normal PDF over (-inf, +inf) equals 1.' },
+      { subjectId: 'math3', question: 'Student\'s t-test is used for hypothesis testing when sample size n is:', options: ['n >= 30', 'n < 30', 'n = 100', 'Always applicable'], correct: 1, diff: 'Medium', explanation: 't-test is specifically designed for small sample sizes (n < 30).' },
+
+      { subjectId: 'nt', question: 'According to Maximum Power Transfer Theorem, maximum power is delivered when load impedance ZL equals:', options: ['Zth', 'Complex conjugate of Zth', 'Zero', 'Infinity'], correct: 1, diff: 'Medium', explanation: 'For AC networks, maximum power transfer requires ZL = Zth*.' },
+      { subjectId: 'nt', question: 'In a series RLC resonant circuit, the impedance at resonance is:', options: ['Maximum & purely inductive', 'Minimum & purely resistive', 'Zero', 'Infinite'], correct: 1, diff: 'Easy', explanation: 'At resonance, XL = XC cancel out, leaving Z = R (minimum impedance).' },
+      { subjectId: 'nt', question: 'How many parameters are needed to characterize a Two-Port Network?', options: ['2', '4', '6', '8'], correct: 1, diff: 'Easy', explanation: 'Two-port networks relate 2 voltages and 2 currents using 4 matrix parameters.' },
+
+      { subjectId: 'ss', question: 'A continuous LTI system with impulse response h(t) is BIBO stable if:', options: ['h(t) is continuous', 'Integral of |h(t)| dt is finite', 'h(t) is zero for t < 0', 'h(t) = 1'], correct: 1, diff: 'Medium', explanation: 'BIBO stability requires absolute integrability of impulse response h(t).' },
+      { subjectId: 'ss', question: 'Convolution in the time domain corresponds to which operation in the frequency domain?', options: ['Addition', 'Multiplication', 'Integration', 'Differentiation'], correct: 1, diff: 'Easy', explanation: 'Convolution property: FT{x(t) * h(t)} = X(w) . H(w).' },
+      { subjectId: 'ss', question: 'What is the Z-transform of the unit impulse signal delta(n)?', options: ['1', '1/z', 'z/(z-1)', '0'], correct: 0, diff: 'Easy', explanation: 'Z{delta(n)} = SUM delta(n) z^(-n) at n=0 equals 1 for all z.' }
+    ];
+
+    const REVISION_FLASHCARDS = [
+      { subject: 'Data Structures', term: 'Big-O Notation', definition: 'Upper bound asymptotic complexity describing worst-case algorithm runtime execution.' },
+      { subject: 'Digital System Design', term: 'De Morgan\'s First Law', definition: '(A + B)\' = A\' . B\' — The complement of a sum equals the product of individual complements.' },
+      { subject: 'Electronic Devices', term: 'Hall Effect', definition: 'Production of transverse voltage across a conductor carrying current inside a perpendicular magnetic field.' },
+      { subject: 'Environmental Science', term: 'BOD vs COD', definition: 'BOD measures biodegradable organic oxygen demand; COD measures total (biodegradable + non-biodegradable) demand.' },
+      { subject: 'Mathematics-III', term: 'Bayes Theorem', definition: 'P(A|B) = [P(B|A) * P(A)] / P(B) — Calculates updated probability of an event given prior evidence.' },
+      { subject: 'Network Theory', term: 'Thevenin\'s Theorem', definition: 'Any linear two-terminal circuit can be replaced by an equivalent voltage source Vth in series with resistance Rth.' },
+      { subject: 'Signals & Systems', term: 'Gibbs Phenomenon', definition: 'Overshoot (~9%) occurring near discontinuities when approximating piecewise continuous functions with Fourier series.' }
+    ];
+
+    const NAV_ITEMS = [
+      { id: 'dashboard', label: 'Dashboard', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 00-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>' },
+      { id: 'subjects', label: 'Subjects & Syllabus', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>' },
+      { id: 'simulator', label: 'Exam Simulator & MCQ', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>' },
+      { id: 'flashcards', label: 'Revision Flashcards', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>' },
+      { id: 'planner', label: 'Study Planner', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>' },
+      { id: 'notes', label: 'Notes & Vault', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>' },
+      { id: 'resources', label: 'Resource Vault', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>' },
+      { id: 'analytics', label: 'Progress Analytics', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>' }
+    ];
+
+    // --- 3. STATE & STORAGE ---
+    let appState = {
+      user: null,
+      completedTopics: {},
+      bookmarkedTopics: {},
+      tasks: [],
+      notes: [],
+      customQuestions: [],
+      customResources: [],
+      studyMinutesToday: 0,
+      streakDays: 1,
+      lastActiveDate: new Date().toISOString().split('T')[0],
+      quizAnswers: {}
+    };
+
+    let activeSubjectId = 'dsa';
+    let activeSubTab = 'syllabus';
+    let currentQuizQuestions = [];
+    let pomodoroInterval = null;
+    let pomoTimeRemaining = 25 * 60;
+    let isPomoRunning = false;
+    let simTimerInterval = null;
+    let doughnutChartInstance = null;
+    let barChartInstance = null;
+
+    function loadState() {
+      const saved = localStorage.getItem('makaut_ece_lms_state');
+      if (saved) {
+        try { appState = { ...appState, ...JSON.parse(saved) }; } catch(e) {}
+      }
+
+      // Check Daily Streak
+      const today = new Date().toISOString().split('T')[0];
+      if (appState.lastActiveDate !== today) {
+        const last = new Date(appState.lastActiveDate);
+        const diffDays = Math.round((new Date(today) - last) / (1000 * 60 * 60 * 24));
+        if (diffDays === 1) appState.streakDays += 1;
+        else if (diffDays > 1) appState.streakDays = 1;
+        appState.studyMinutesToday = 0;
+        appState.lastActiveDate = today;
+        saveState();
+      }
+
+      const theme = localStorage.getItem('makaut_theme') || 'light';
+      setTheme(theme);
+    }
+
+    function saveState() {
+      localStorage.setItem('makaut_ece_lms_state', JSON.stringify(appState));
+    }
+
+    // --- 4. NAVIGATION & THEME ---
+    function navigate(viewId) {
+      document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
+      const target = document.getElementById(`view-${viewId}`);
+      if (target) target.classList.remove('hidden');
+
+      document.querySelectorAll('.nav-link-btn').forEach(btn => {
+        if (btn.dataset.view === viewId) {
+          btn.className = 'nav-link-btn flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-xs transition bg-brand-600 text-white shadow-md shadow-brand-600/20';
+        } else {
+          btn.className = 'nav-link-btn flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-xs text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition';
+        }
+      });
+
+      if (viewId === 'dashboard') renderDashboard();
+      if (viewId === 'subjects') renderSubjectView();
+      if (viewId === 'simulator') renderSimulatorView();
+      if (viewId === 'flashcards') renderFlashcards();
+      if (viewId === 'planner') renderPlannerView();
+      if (viewId === 'notes') renderNotesView();
+      if (viewId === 'resources') renderResourcesView();
+      if (viewId === 'analytics') renderAnalyticsView();
+      if (viewId === 'profile') renderProfileView();
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderNav() {
+      const container = document.getElementById('navLinksContainer');
+      const mobileNav = document.getElementById('mobileBottomNav');
+
+      container.innerHTML = NAV_ITEMS.map(item => `
+        <button onclick="navigate('${item.id}')" data-view="${item.id}" class="nav-link-btn flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-xs text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition w-full">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">${item.icon}</svg>
+          <span>${item.label}</span>
+        </button>
+      `).join('');
+
+      mobileNav.innerHTML = NAV_ITEMS.slice(0, 5).map(item => `
+        <button onclick="navigate('${item.id}')" class="flex flex-col items-center gap-0.5 p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">${item.icon}</svg>
+          <span>${item.label.split(' ')[0]}</span>
+        </button>
+      `).join('');
+    }
+
+    function setTheme(theme) {
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.getElementById('sunIcon').classList.remove('hidden');
+        document.getElementById('moonIcon').classList.add('hidden');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.getElementById('sunIcon').classList.add('hidden');
+        document.getElementById('moonIcon').classList.remove('hidden');
+      }
+      localStorage.setItem('makaut_theme', theme);
+    }
+
+    function showToast(msg, type = 'info') {
+      const box = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `p-3.5 rounded-2xl shadow-2xl text-xs font-bold text-white pointer-events-auto transition-all transform translate-y-2 opacity-0 flex items-center justify-between gap-3 ${
+        type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-rose-600' : 'bg-slate-900'
+      }`;
+      toast.innerHTML = `<span>${msg}</span><button onclick="this.parentElement.remove()" class="opacity-70 hover:opacity-100">✕</button>`;
+      box.appendChild(toast);
+      
+      setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+      setTimeout(() => { toast.classList.add('opacity-0'); setTimeout(() => toast.remove(), 200); }, 3500);
+    }
+
+    function showConfirm(title, msg, onOk) {
+      document.getElementById('confirmTitle').innerText = title;
+      document.getElementById('confirmMsg').innerText = msg;
+      const modal = document.getElementById('confirmModal');
+      modal.classList.remove('hidden');
+
+      const okBtn = document.getElementById('confirmOkBtn');
+      const cancelBtn = document.getElementById('confirmCancelBtn');
+
+      const cleanup = () => {
+        modal.classList.add('hidden');
+        okBtn.removeEventListener('click', handleOk);
+        cancelBtn.removeEventListener('click', handleCancel);
+      };
+      const handleOk = () => { cleanup(); onOk(); };
+      const handleCancel = () => { cleanup(); };
+
+      okBtn.addEventListener('click', handleOk);
+      cancelBtn.addEventListener('click', handleCancel);
+    }
+
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    // --- 5. POMODORO FOCUS TIMER ---
+    function togglePomodoro() {
+      const btn = document.getElementById('pomoStartBtn');
+      if (isPomoRunning) {
+        clearInterval(pomodoroInterval);
+        isPomoRunning = false;
+        btn.innerText = 'Resume';
+        btn.className = 'flex-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2 rounded-xl transition shadow';
+      } else {
+        isPomoRunning = true;
+        btn.innerText = 'Pause';
+        btn.className = 'flex-1 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold py-2 rounded-xl transition shadow';
+
+        pomodoroInterval = setInterval(() => {
+          pomoTimeRemaining--;
+          updatePomoDisplay();
+
+          if (pomoTimeRemaining <= 0) {
+            clearInterval(pomodoroInterval);
+            isPomoRunning = false;
+            appState.studyMinutesToday += 25;
+            saveState();
+            showToast('25 Min Focus session complete! Logged study time.', 'success');
+            resetPomodoro();
+            renderDashboard();
+          }
+        }, 1000);
+      }
+    }
+
+    function resetPomodoro() {
+      clearInterval(pomodoroInterval);
+      isPomoRunning = false;
+      pomoTimeRemaining = 25 * 60;
+      updatePomoDisplay();
+      const btn = document.getElementById('pomoStartBtn');
+      btn.innerText = 'Start';
+      btn.className = 'flex-1 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold py-2 rounded-xl transition shadow';
+    }
+
+    function updatePomoDisplay() {
+      const m = Math.floor(pomoTimeRemaining / 60);
+      const s = pomoTimeRemaining % 60;
+      document.getElementById('pomoTimeDisplay').innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+    }
+
+    // --- 6. DASHBOARD LOGIC ---
+    function renderDashboard() {
+      if (!appState.user) return;
+
+      document.getElementById('dashGreeting').innerText = `Welcome Back, ${appState.user.name.split(' ')[0]}! 👋`;
+      document.getElementById('headerName').innerText = appState.user.name;
+      document.getElementById('headerAvatar').innerText = appState.user.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+      document.getElementById('headerStreakText').innerText = `${appState.streakDays} Days`;
+      document.getElementById('dashStreakValue').innerText = `${appState.streakDays} Days`;
+
+      let totalTopicsCount = 0;
+      let completedCount = 0;
+
+      SUBJECTS_DATA.forEach(s => {
+        s.units.forEach((u, uIdx) => {
+          u.topics.forEach((t, tIdx) => {
+            totalTopicsCount++;
+            if (appState.completedTopics[`${s.id}_u${uIdx}_t${tIdx}`]) completedCount++;
+          });
+        });
+      });
+
+      const pendingCount = totalTopicsCount - completedCount;
+      const overallPct = totalTopicsCount ? Math.round((completedCount / totalTopicsCount) * 100) : 0;
+
+      document.getElementById('dashTotalTopics').innerText = totalTopicsCount;
+      document.getElementById('dashCompletedTopics').innerText = completedCount;
+      document.getElementById('dashPendingTopics').innerText = `${pendingCount} Pending`;
+      document.getElementById('dashOverallPct').innerText = `${overallPct}%`;
+
+      // Subject Progress List
+      const progList = document.getElementById('dashSubjectProgressList');
+      progList.innerHTML = SUBJECTS_DATA.map(s => {
+        let sTotal = 0, sComp = 0;
+        s.units.forEach((u, uIdx) => {
+          u.topics.forEach((t, tIdx) => {
+            sTotal++;
+            if (appState.completedTopics[`${s.id}_u${uIdx}_t${tIdx}`]) sComp++;
+          });
+        });
+        const pct = sTotal ? Math.round((sComp / sTotal) * 100) : 0;
+
+        return `
+          <div onclick="selectSubject('${s.id}')" class="p-3.5 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-200 dark:border-slate-700/60 cursor-pointer hover:border-brand-500 transition space-y-2">
+            <div class="flex justify-between items-center text-xs font-bold">
+              <span class="text-slate-900 dark:text-white truncate">${s.name} <span class="text-slate-400 font-medium">(${s.code})</span></span>
+              <span class="text-brand-600 dark:text-brand-400">${pct}%</span>
+            </div>
+            <div class="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+              <div class="bg-brand-600 h-full transition-all duration-300" style="width: ${pct}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Today Tasks Widget
+      const todayTasksBox = document.getElementById('dashTodayTasks');
+      if (appState.tasks.length === 0) {
+        todayTasksBox.innerHTML = `<p class="text-slate-400 text-center py-2">No active tasks created.</p>`;
+      } else {
+        todayTasksBox.innerHTML = appState.tasks.slice(0, 4).map(t => `
+          <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700">
+            <span class="${t.completed ? 'line-through text-slate-400' : 'text-slate-700 dark:text-slate-200'} font-semibold truncate">${t.title}</span>
+            <span class="text-[10px] px-2 py-0.5 rounded font-bold ${t.completed ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${t.completed ? 'Done' : 'Pending'}</span>
+          </div>
+        `).join('');
+      }
+    }
+
+    // --- 7. SUBJECT & SYLLABUS LOGIC ---
+    function selectSubject(id) {
+      activeSubjectId = id;
+      navigate('subjects');
+    }
+
+    function renderSubjectView() {
+      const tabBox = document.getElementById('subjectTabButtons');
+      tabBox.innerHTML = SUBJECTS_DATA.map(s => `
+        <button onclick="activeSubjectId='${s.id}'; renderSubjectView();" class="px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition ${
+          activeSubjectId === s.id ? 'bg-brand-600 text-white shadow-md' : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100'
+        }">${s.name}</button>
+      `).join('');
+
+      const s = SUBJECTS_DATA.find(x => x.id === activeSubjectId);
+      if (!s) return;
+
+      let sTotal = 0, sComp = 0;
+      s.units.forEach((u, uIdx) => {
+        u.topics.forEach((t, tIdx) => {
+          sTotal++;
+          if (appState.completedTopics[`${s.id}_u${uIdx}_t${tIdx}`]) sComp++;
+        });
+      });
+      const sPct = sTotal ? Math.round((sComp / sTotal) * 100) : 0;
+
+      document.getElementById('activeSubjectCard').innerHTML = `
+        <div class="space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <span class="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider">${s.code} • ${s.credits}</span>
+              <h2 class="text-2xl font-black text-slate-900 dark:text-white">${s.name}</h2>
+            </div>
+            <span class="text-xs bg-brand-500/10 text-brand-700 dark:text-brand-300 border border-brand-500/30 px-3 py-1 rounded-full font-semibold">${s.badge}</span>
+          </div>
+          <div class="space-y-1.5">
+            <div class="flex justify-between items-center text-xs font-bold text-slate-600 dark:text-slate-400">
+              <span>Syllabus Completion</span>
+              <span class="text-brand-600 dark:text-brand-400">${sComp} of ${sTotal} Topics (${sPct}%)</span>
+            </div>
+            <div class="w-full bg-slate-100 dark:bg-slate-800 h-3 rounded-full overflow-hidden">
+              <div class="bg-brand-600 h-full transition-all duration-300" style="width: ${sPct}%"></div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      renderSubTabContent();
+    }
+
+    function switchSubTab(subTab) {
+      activeSubTab = subTab;
+      document.querySelectorAll('.subtab-btn').forEach(btn => btn.className = 'subtab-btn px-5 py-3.5 text-slate-500 border-b-2 border-transparent');
+      const activeBtn = document.getElementById(`subTab-${subTab}`);
+      if (activeBtn) activeBtn.className = 'subtab-btn px-5 py-3.5 border-b-2 border-brand-600 text-brand-600 font-bold';
+
+      document.querySelectorAll('.subtab-content').forEach(c => c.classList.add('hidden'));
+      const activeContent = document.getElementById(`subTabContent-${subTab}`);
+      if (activeContent) activeContent.classList.remove('hidden');
+
+      renderSubTabContent();
+    }
+
+    function renderSubTabContent() {
+      const s = SUBJECTS_DATA.find(x => x.id === activeSubjectId);
+      if (!s) return;
+
+      if (activeSubTab === 'syllabus') {
+        const box = document.getElementById('subTabContent-syllabus');
+        box.innerHTML = s.units.map((u, uIdx) => `
+          <div class="bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 rounded-2xl p-4 space-y-3">
+            <h4 class="font-bold text-slate-900 dark:text-white text-sm">${u.title}</h4>
+            <div class="space-y-2 text-xs">
+              ${u.topics.map((t, tIdx) => {
+                const key = `${s.id}_u${uIdx}_t${tIdx}`;
+                const isChecked = !!appState.completedTopics[key];
+                const isBookmarked = !!appState.bookmarkedTopics[key];
+                return `
+                  <div class="flex items-center justify-between bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
+                    <label class="flex items-center gap-3 cursor-pointer flex-1">
+                      <input type="checkbox" onchange="toggleTopic('${key}', '${t.replace(/'/g, "\\'")}')" ${isChecked ? 'checked' : ''} class="w-4 h-4 rounded text-brand-600 focus:ring-brand-500">
+                      <span class="${isChecked ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-200'} font-semibold">${t}</span>
+                    </label>
+                    <button onclick="toggleBookmark('${key}', '${t.replace(/'/g, "\\'")}')" class="p-1 text-slate-400 hover:text-amber-500 transition">
+                      <svg class="w-4 h-4 ${isBookmarked ? 'text-amber-500 fill-amber-500' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+                    </button>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `).join('');
+      }
+
+      if (activeSubTab === 'notes') {
+        const box = document.getElementById('subTabContent-notes');
+        box.innerHTML = `<div class="space-y-3 text-xs">${s.notes.map(n => `<div class="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium">💡 ${n}</div>`).join('')}</div>`;
+      }
+
+      if (activeSubTab === 'important') {
+        const box = document.getElementById('subTabContent-important');
+        box.innerHTML = `<div class="space-y-2 text-xs">${s.important.map(imp => `<div class="flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 text-amber-900 dark:text-amber-300 p-3 rounded-xl font-bold"><svg class="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg><span>${imp}</span></div>`).join('')}</div>`;
+      }
+
+      if (activeSubTab === 'pyq') {
+        const box = document.getElementById('subTabContent-pyq');
+        box.innerHTML = `<div class="space-y-3 text-xs">${s.pyqs.map(p => `<div class="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 flex justify-between items-start gap-3"><p class="font-semibold text-slate-800 dark:text-slate-200">Q: ${p.q}</p><span class="bg-brand-100 text-brand-700 text-[10px] font-bold px-2 py-0.5 rounded shrink-0">MAKAUT ${p.year}</span></div>`).join('')}</div>`;
+      }
+
+      if (activeSubTab === 'resources') {
+        const box = document.getElementById('subTabContent-resources');
+        box.innerHTML = `<div class="space-y-3 text-xs">${s.resources.map(r => `<a href="${r.url}" target="_blank" rel="noopener noreferrer" class="bg-slate-50 dark:bg-slate-800/40 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 flex items-center justify-between hover:border-brand-500 transition"><span class="font-bold text-slate-800 dark:text-slate-200">${r.title} (${r.type})</span><svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg></a>`).join('')}</div>`;
+      }
+    }
+
+    function toggleTopic(key, title) {
+      if (appState.completedTopics[key]) {
+        delete appState.completedTopics[key];
+      } else {
+        appState.completedTopics[key] = true;
+        showToast('Topic marked as completed!', 'success');
+      }
+      saveState();
+      renderSubjectView();
+    }
+
+    function toggleBookmark(key, title) {
+      if (appState.bookmarkedTopics[key]) {
+        delete appState.bookmarkedTopics[key];
+        showToast('Removed bookmark');
+      } else {
+        appState.bookmarkedTopics[key] = title;
+        showToast('Added to bookmarks!', 'success');
+      }
+      saveState();
+      renderSubjectView();
+    }
+
+    // --- 8. EXAM SIMULATOR & MCQ LOGIC ---
+    function renderSimulatorView() {
+      const sel = document.getElementById('quizSubjectSelect');
+      sel.innerHTML = `<option value="all">All 7 ECE Subjects</option>` + SUBJECTS_DATA.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+      loadQuizForSubject();
+    }
+
+    function loadQuizForSubject() {
+      const selected = document.getElementById('quizSubjectSelect').value;
+      const diffFilter = document.getElementById('quizDiffSelect').value;
+      let allQs = [...DEFAULT_MCQS, ...appState.customQuestions];
+
+      if (selected !== 'all') allQs = allQs.filter(q => q.subjectId === selected);
+      if (diffFilter !== 'all') allQs = allQs.filter(q => q.diff === diffFilter);
+
+      currentQuizQuestions = allQs;
+      appState.quizAnswers = {};
+      document.getElementById('quizResultBox').classList.add('hidden');
+      document.getElementById('simHeaderBar').classList.add('hidden');
+      clearInterval(simTimerInterval);
+
+      renderQuizQuestions();
+    }
+
+    function renderQuizQuestions() {
+      const box = document.getElementById('quizContainer');
+      if (currentQuizQuestions.length === 0) {
+        box.innerHTML = `<p class="text-slate-400 text-center py-8 text-xs">No questions found matching selected filters.</p>`;
+        return;
+      }
+
+      box.innerHTML = currentQuizQuestions.map((q, idx) => {
+        const userAns = appState.quizAnswers[idx];
+        const isSubmitted = userAns !== undefined;
+
+        return `
+          <div class="bg-slate-50 dark:bg-slate-800/40 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
+            <div class="flex justify-between items-start gap-2">
+              <span class="text-xs font-bold text-slate-900 dark:text-white">Q${idx + 1}. ${q.question}</span>
+              <div class="flex gap-1">
+                <span class="text-[10px] bg-slate-200 dark:bg-slate-700 px-2 py-0.5 rounded font-bold text-slate-600 dark:text-slate-300 uppercase">${q.subjectId}</span>
+                <span class="text-[10px] ${q.diff === 'Hard' ? 'bg-rose-100 text-rose-700' : q.diff === 'Medium' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'} px-2 py-0.5 rounded font-bold">${q.diff || 'Medium'}</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+              ${q.options.map((opt, oIdx) => {
+                let optStyle = 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300';
+                if (isSubmitted) {
+                  if (oIdx === q.correct) optStyle = 'bg-emerald-100 dark:bg-emerald-950/60 border-emerald-500 text-emerald-800 dark:text-emerald-300 font-bold';
+                  else if (userAns === oIdx) optStyle = 'bg-rose-100 dark:bg-rose-950/60 border-rose-500 text-rose-800 dark:text-rose-300';
+                }
+
+                return `
+                  <button onclick="submitAnswer(${idx}, ${oIdx})" ${isSubmitted ? 'disabled' : ''} class="p-3 rounded-xl border text-left transition hover:border-brand-500 ${optStyle}">
+                    <span class="font-bold mr-1.5">${['A','B','C','D'][oIdx]}.</span> ${opt}
+                  </button>
+                `;
+              }).join('')}
+            </div>
+
+            ${isSubmitted ? `
+              <div class="mt-3 p-3 rounded-xl bg-brand-50 dark:bg-slate-900 border border-brand-100 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-300">
+                <strong class="text-brand-600 dark:text-brand-400">Step-by-step Solution:</strong> ${q.explanation}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function submitAnswer(qIdx, optionIdx) {
+      appState.quizAnswers[qIdx] = optionIdx;
+      renderQuizQuestions();
+      if (Object.keys(appState.quizAnswers).length === currentQuizQuestions.length) {
+        finishExamSimulator();
+      }
+    }
+
+    function startExamSimulator() {
+      document.getElementById('quizSubjectSelect').value = 'all';
+      document.getElementById('quizDiffSelect').value = 'all';
+      loadQuizForSubject();
+
+      document.getElementById('simHeaderBar').classList.remove('hidden');
+      let timeLeft = 20 * 60; // 20 Mins
+
+      simTimerInterval = setInterval(() => {
+        timeLeft--;
+        const m = Math.floor(timeLeft / 60);
+        const s = timeLeft % 60;
+        document.getElementById('simTimerText').innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+
+        if (timeLeft <= 0) {
+          clearInterval(simTimerInterval);
+          finishExamSimulator();
+        }
+      }, 1000);
+
+      showToast('Timed 20-Min Exam Simulator started!', 'info');
+    }
+
+    function finishExamSimulator() {
+      clearInterval(simTimerInterval);
+      let correct = 0;
+      currentQuizQuestions.forEach((q, idx) => {
+        if (appState.quizAnswers[idx] === q.correct) correct++;
+      });
+      const pct = Math.round((correct / currentQuizQuestions.length) * 100);
+
+      document.getElementById('resultPctCircle').innerText = `${pct}%`;
+      document.getElementById('resultSubtitle').innerText = `You scored ${correct} out of ${currentQuizQuestions.length} correctly. Accuracy: ${pct}%`;
+      document.getElementById('quizResultBox').classList.remove('hidden');
+    }
+
+    function resetQuiz() {
+      appState.quizAnswers = {};
+      document.getElementById('quizResultBox').classList.add('hidden');
+      renderQuizQuestions();
+    }
+
+    // --- 9. FLASHCARDS LOGIC ---
+    function renderFlashcards() {
+      const sel = document.getElementById('flashcardSubjectSelect');
+      if (sel.children.length === 0) {
+        sel.innerHTML = `<option value="all">All Flashcards</option>` + SUBJECTS_DATA.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+      }
+
+      const selected = sel.value;
+      let cards = REVISION_FLASHCARDS;
+      if (selected !== 'all') cards = cards.filter(c => c.subject === selected);
+
+      const grid = document.getElementById('flashcardsGrid');
+      grid.innerHTML = cards.map(c => `
+        <div class="flashcard h-44 cursor-pointer" onclick="this.classList.toggle('flipped')">
+          <div class="flashcard-inner relative w-full h-full shadow-lg rounded-2xl border border-slate-200 dark:border-slate-800">
+            <div class="flashcard-front absolute inset-0 bg-white dark:bg-slate-900 rounded-2xl p-5 flex flex-col justify-between">
+              <span class="text-[10px] font-bold text-brand-600 uppercase tracking-widest">${c.subject}</span>
+              <h4 class="text-base font-black text-slate-900 dark:text-white text-center">${c.term}</h4>
+              <span class="text-[10px] text-slate-400 text-center font-semibold">Click to flip answer ↷</span>
+            </div>
+            <div class="flashcard-back absolute inset-0 bg-slate-900 text-white rounded-2xl p-5 flex flex-col justify-between">
+              <span class="text-[10px] font-bold text-amber-400 uppercase tracking-widest">Definition / Formula</span>
+              <p class="text-xs text-slate-200 font-medium text-center">${c.definition}</p>
+              <span class="text-[10px] text-slate-400 text-center">Click to flip back</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // --- 10. PLANNER & TASK KANBAN ---
+    function renderPlannerView() {
+      const sel = document.getElementById('taskSubject');
+      sel.innerHTML = SUBJECTS_DATA.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+      filterTasks('all');
+    }
+
+    function filterTasks(filter) {
+      document.querySelectorAll('.task-filter-btn').forEach(btn => btn.className = 'task-filter-btn px-3 py-1 rounded-lg text-slate-500 font-semibold');
+      const activeBtn = document.getElementById(`taskFilter-${filter}`);
+      if (activeBtn) activeBtn.className = 'task-filter-btn px-3 py-1 rounded-lg bg-white dark:bg-slate-700 shadow text-slate-900 dark:text-white font-bold';
+
+      const box = document.getElementById('taskList');
+      let filtered = appState.tasks;
+      if (filter === 'pending') filtered = appState.tasks.filter(t => !t.completed);
+      if (filter === 'completed') filtered = appState.tasks.filter(t => t.completed);
+
+      if (filtered.length === 0) {
+        box.innerHTML = `<p class="text-slate-400 text-center py-8 text-xs">No tasks found for this view.</p>`;
+        return;
+      }
+
+      box.innerHTML = filtered.map(t => `
+        <div class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs">
+          <div class="flex items-center gap-3">
+            <input type="checkbox" onchange="toggleTask('${t.id}')" ${t.completed ? 'checked' : ''} class="w-4 h-4 rounded text-brand-600 focus:ring-brand-500">
+            <div>
+              <div class="${t.completed ? 'line-through text-slate-400' : 'text-slate-900 dark:text-white'} font-semibold">${t.title}</div>
+              <div class="text-[10px] text-slate-400">${t.subject} • Due: ${t.date}</div>
+            </div>
+          </div>
+          <button onclick="deleteTask('${t.id}')" class="text-slate-400 hover:text-rose-500 transition p-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function toggleTask(id) {
+      const task = appState.tasks.find(t => t.id === id);
+      if (task) {
+        task.completed = !task.completed;
+        saveState();
+        renderPlannerView();
+      }
+    }
+
+    function deleteTask(id) {
+      showConfirm('Delete Task', 'Remove this task permanently?', () => {
+        appState.tasks = appState.tasks.filter(t => t.id !== id);
+        saveState();
+        renderPlannerView();
+        showToast('Task removed');
+      });
+    }
+
+    // --- 11. NOTES LOGIC ---
+    function renderNotesView() {
+      const sel = document.getElementById('noteSubject');
+      sel.innerHTML = SUBJECTS_DATA.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+
+      const box = document.getElementById('notesContainer');
+      if (appState.notes.length === 0) {
+        box.innerHTML = `<p class="text-slate-400 text-center py-8 text-xs col-span-2">No notes created yet. Click "+ New Note" to write one!</p>`;
+      } else {
+        box.innerHTML = appState.notes.map(n => `
+          <div class="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 text-xs space-y-2 flex flex-col justify-between">
+            <div>
+              <span class="text-[10px] font-bold text-brand-600 uppercase tracking-wider">${n.subject}</span>
+              <h4 class="font-bold text-slate-900 dark:text-white text-sm mt-0.5">${n.title}</h4>
+              <p class="text-slate-600 dark:text-slate-300 mt-2 whitespace-pre-line">${n.content}</p>
+            </div>
+            <div class="flex justify-between items-center pt-2 text-[10px] text-slate-400 border-t border-slate-200 dark:border-slate-700">
+              <span>${n.date}</span>
+              <button onclick="deleteNote('${n.id}')" class="text-rose-500 hover:underline">Delete</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      const bmBox = document.getElementById('bookmarksList');
+      const bmKeys = Object.keys(appState.bookmarkedTopics);
+      if (bmKeys.length === 0) {
+        bmBox.innerHTML = `<p class="text-slate-400 text-center py-4 text-xs">No topics bookmarked yet.</p>`;
+      } else {
+        bmBox.innerHTML = bmKeys.map(k => `
+          <div class="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-900 dark:text-amber-300 font-medium flex items-center justify-between">
+            <span class="truncate">${appState.bookmarkedTopics[k]}</span>
+            <button onclick="toggleBookmark('${k}', '')" class="text-slate-400 hover:text-rose-500 ml-2">✕</button>
+          </div>
+        `).join('');
+      }
+    }
+
+    function openNoteForm() { document.getElementById('noteFormContainer').classList.remove('hidden'); }
+    function closeNoteForm() { document.getElementById('noteFormContainer').classList.add('hidden'); }
+
+    function saveNote() {
+      const title = document.getElementById('noteTitle').value.trim();
+      const subject = document.getElementById('noteSubject').value;
+      const content = document.getElementById('noteContent').value.trim();
+
+      if (!title || !content) { showToast('Please enter both title and content', 'error'); return; }
+
+      appState.notes.unshift({ id: 'note_' + Date.now(), title, subject, content, date: new Date().toLocaleDateString() });
+      saveState();
+      showToast('Note saved to vault!', 'success');
+      document.getElementById('noteTitle').value = '';
+      document.getElementById('noteContent').value = '';
+      closeNoteForm();
+      renderNotesView();
+    }
+
+    function deleteNote(id) {
+      showConfirm('Delete Note', 'Are you sure you want to delete this note?', () => {
+        appState.notes = appState.notes.filter(n => n.id !== id);
+        saveState();
+        renderNotesView();
+        showToast('Note deleted');
+      });
+    }
+
+    // --- 12. RESOURCES LOGIC ---
+    function renderResourcesView() {
+      const sel = document.getElementById('resSubject');
+      sel.innerHTML = SUBJECTS_DATA.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+
+      const box = document.getElementById('allResourcesContainer');
+      box.innerHTML = SUBJECTS_DATA.map(s => {
+        const userRes = appState.customResources.filter(r => r.subject === s.name);
+        return `
+          <div class="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
+            <h4 class="font-bold text-slate-900 dark:text-white text-sm">${s.name} (${s.code})</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+              ${s.resources.map(r => `
+                <a href="${r.url}" target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between hover:border-brand-500 transition">
+                  <span class="font-semibold text-slate-800 dark:text-slate-200 truncate">${r.title}</span>
+                  <span class="text-[10px] bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-500 uppercase">${r.type}</span>
+                </a>
+              `).join('')}
+              ${userRes.map(r => `
+                <a href="${r.url}" target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-brand-300 dark:border-brand-800 flex items-center justify-between hover:border-brand-500 transition">
+                  <span class="font-bold text-brand-600 dark:text-brand-400 truncate">★ ${r.title}</span>
+                  <span class="text-[10px] bg-brand-50 text-brand-700 px-2 py-0.5 rounded uppercase">${r.type}</span>
+                </a>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // --- 13. CHART.JS ANALYTICS LOGIC ---
+    function renderAnalyticsView() {
+      let totalTopicsCount = 0;
+      let completedCount = 0;
+      const subjectPctList = [];
+
+      SUBJECTS_DATA.forEach(s => {
+        let sTotal = 0, sComp = 0;
+        s.units.forEach((u, uIdx) => {
+          u.topics.forEach((t, tIdx) => {
+            sTotal++;
+            totalTopicsCount++;
+            if (appState.completedTopics[`${s.id}_u${uIdx}_t${tIdx}`]) {
+              sComp++;
+              completedCount++;
+            }
+          });
+        });
+        subjectPctList.push(sTotal ? Math.round((sComp / sTotal) * 100) : 0);
+      });
+
+      const pendingCount = totalTopicsCount - completedCount;
+
+      // Render Doughnut Chart
+      const ctxDoughnut = document.getElementById('chartDoughnut').getContext('2d');
+      if (doughnutChartInstance) doughnutChartInstance.destroy();
+      doughnutChartInstance = new Chart(ctxDoughnut, {
+        type: 'doughnut',
+        data: {
+          labels: ['Completed Topics', 'Pending Topics'],
+          datasets: [{
+            data: [completedCount, pendingCount],
+            backgroundColor: ['#2563eb', '#cbd5e1'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom', labels: { font: { family: 'Plus Jakarta Sans', size: 10 } } } }
+        }
+      });
+
+      // Render Bar Chart
+      const ctxBar = document.getElementById('chartBar').getContext('2d');
+      if (barChartInstance) barChartInstance.destroy();
+      barChartInstance = new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+          labels: ['DSA', 'DSD', 'ED', 'EVS', 'Math-III', 'NT', 'S&S'],
+          datasets: [{
+            label: 'Completion %',
+            data: subjectPctList,
+            backgroundColor: '#3b82f6',
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: { y: { beginAtZero: true, max: 100 } },
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    function exportProgressJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
+      const a = document.createElement('a');
+      a.setAttribute("href", dataStr);
+      a.setAttribute("download", `MAKAUT_ECE_Prep_Backup_${Date.now()}.json`);
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      showToast('Backup exported successfully!', 'success');
+    }
+
+    function importProgressJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (imported && imported.user) {
+            appState = imported;
+            saveState();
+            showToast('State restored successfully!', 'success');
+            navigate('dashboard');
+          } else showToast('Invalid backup file', 'error');
+        } catch(err) { showToast('JSON parsing error', 'error'); }
+      };
+      reader.readAsText(file);
+    }
+
+    function resetAllProgress() {
+      showConfirm('Reset All Progress', 'Wipe all completed topics, notes, and task progress?', () => {
+        appState.completedTopics = {};
+        appState.bookmarkedTopics = {};
+        appState.tasks = [];
+        appState.notes = [];
+        appState.customQuestions = [];
+        appState.customResources = [];
+        saveState();
+        showToast('All progress reset');
+        navigate('dashboard');
+      });
+    }
+
+    // --- 14. SHARE PROGRESS SUMMARY ---
+    function openShareProgressModal() {
+      if (!appState.user) return;
+      document.getElementById('shareStudentName').innerText = appState.user.name;
+      document.getElementById('shareCollege').innerText = appState.user.college || 'MAKAUT Affiliated College';
+      document.getElementById('shareTargetCgpa').innerText = appState.user.cgpa || '8.5';
+      document.getElementById('shareStreak').innerText = `${appState.streakDays} Days`;
+
+      let total = 0, comp = 0;
+      SUBJECTS_DATA.forEach(s => {
+        s.units.forEach((u, uIdx) => {
+          u.topics.forEach((t, tIdx) => {
+            total++;
+            if (appState.completedTopics[`${s.id}_u${uIdx}_t${tIdx}`]) comp++;
+          });
+        });
+      });
+      const pct = total ? Math.round((comp / total) * 100) : 0;
+      document.getElementById('shareSyllabusPct').innerText = `${pct}%`;
+
+      openModal('shareProgressModal');
+    }
+
+    function copyShareText() {
+      const text = `🎓 MAKAUT B.Tech ECE 3rd Sem Exam Prep Update:\nStudent: ${appState.user.name}\nSyllabus Completed: ${document.getElementById('shareSyllabusPct').innerText}\nStudy Streak: ${appState.streakDays} Days 🔥\nTarget CGPA: ${appState.user.cgpa || 8.5}`;
+      const el = document.createElement('textarea');
+      el.value = text;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      showToast('Summary copied to clipboard!', 'success');
+    }
+
+    // --- 15. PROFILE LOGIC ---
+    function renderProfileView() {
+      if (!appState.user) return;
+      document.getElementById('profName').value = appState.user.name;
+      document.getElementById('profCollege').value = appState.user.college || '';
+      document.getElementById('profEmail').value = appState.user.email;
+      document.getElementById('profRoll').value = appState.user.roll || '';
+      document.getElementById('profCgpa').value = appState.user.cgpa || '';
+    }
+
+    // --- 16. GLOBAL SEARCH ENGINE ---
+    function handleGlobalSearch(query) {
+      const q = query.toLowerCase().trim();
+      const resultsBox = document.getElementById('searchResults');
+      if (!q) {
+        resultsBox.innerHTML = `<p class="text-xs text-slate-400 text-center py-8">Type keywords above to instantly query across all 7 subjects, personal notes, and study links.</p>`;
+        return;
+      }
+
+      let matches = [];
+      SUBJECTS_DATA.forEach(s => {
+        s.units.forEach(u => {
+          u.topics.forEach(t => {
+            if (t.toLowerCase().includes(q)) {
+              matches.push({ type: 'Syllabus Topic', title: t, sub: s.name, action: () => selectSubject(s.id) });
+            }
+          });
+        });
+      });
+
+      appState.notes.forEach(n => {
+        if (n.title.toLowerCase().includes(q) || n.content.toLowerCase().includes(q)) {
+          matches.push({ type: 'Personal Note', title: n.title, sub: n.subject, action: () => navigate('notes') });
+        }
+      });
+
+      if (matches.length === 0) {
+        resultsBox.innerHTML = `<p class="text-xs text-slate-400 text-center py-8">No matching entries found.</p>`;
+        return;
+      }
+
+      resultsBox.innerHTML = matches.slice(0, 10).map((m, idx) => `
+        <div onclick="executeSearchResult(${idx})" class="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-brand-500 transition">
+          <span class="text-[10px] font-bold text-brand-600 uppercase tracking-wider">${m.type} • ${m.sub}</span>
+          <div class="text-xs font-semibold text-slate-900 dark:text-white mt-0.5">${m.title}</div>
+        </div>
+      `).join('');
+
+      window.searchMatches = matches;
+    }
+
+    function executeSearchResult(idx) {
+      if (window.searchMatches && window.searchMatches[idx]) {
+        closeModal('searchModal');
+        window.searchMatches[idx].action();
+      }
+    }
+
+    // --- 17. INITIALIZATION & EVENT LISTENERS ---
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      renderNav();
+
+      if (appState.user) {
+        document.getElementById('authSection').classList.add('hidden');
+        document.getElementById('mainApp').classList.remove('hidden');
+        navigate('dashboard');
+      }
+
+      document.getElementById('themeToggle').addEventListener('click', () => {
+        const isDark = document.documentElement.classList.contains('dark');
+        setTheme(isDark ? 'light' : 'dark');
+      });
+
+      document.getElementById('tabLoginBtn').addEventListener('click', () => {
+        document.getElementById('tabLoginBtn').className = 'flex-1 py-2.5 rounded-xl transition bg-brand-600 text-white shadow';
+        document.getElementById('tabSignupBtn').className = 'flex-1 py-2.5 rounded-xl transition text-slate-400 hover:text-white';
+        document.getElementById('loginForm').classList.remove('hidden');
+        document.getElementById('signupForm').classList.add('hidden');
+      });
+
+      document.getElementById('tabSignupBtn').addEventListener('click', () => {
+        document.getElementById('tabSignupBtn').className = 'flex-1 py-2.5 rounded-xl transition bg-brand-600 text-white shadow';
+        document.getElementById('tabLoginBtn').className = 'flex-1 py-2.5 rounded-xl transition text-slate-400 hover:text-white';
+        document.getElementById('signupForm').classList.remove('hidden');
+        document.getElementById('loginForm').classList.add('hidden');
+      });
+
+      document.getElementById('loginForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value;
+        appState.user = { name: email.split('@')[0], email, college: 'Heritage Institute of Tech', roll: '10900122045', cgpa: 8.8 };
+        saveState();
+        document.getElementById('authSection').classList.add('hidden');
+        document.getElementById('mainApp').classList.remove('hidden');
+        navigate('dashboard');
+        showToast('Signed in successfully!', 'success');
+      });
+
+      document.getElementById('signupForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        appState.user = {
+          name: document.getElementById('regName').value,
+          college: document.getElementById('regCollege').value,
+          email: document.getElementById('regEmail').value,
+          roll: document.getElementById('regRoll').value,
+          cgpa: document.getElementById('regCgpa').value
+        };
+        saveState();
+        document.getElementById('authSection').classList.add('hidden');
+        document.getElementById('mainApp').classList.remove('hidden');
+        navigate('dashboard');
+        showToast('Account created!', 'success');
+      });
+
+      document.getElementById('quickDemoBtn').addEventListener('click', () => {
+        appState.user = { name: 'Debarshi Das', college: 'MAKAUT Main Campus', email: 'debarshi@makaut.ac.in', roll: '10900122088', cgpa: 9.1 };
+        saveState();
+        document.getElementById('authSection').classList.add('hidden');
+        document.getElementById('mainApp').classList.remove('hidden');
+        navigate('dashboard');
+        showToast('Logged in as Guest Demo Student', 'success');
+      });
+
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        showConfirm('Log Out', 'Are you sure you want to log out?', () => {
+          appState.user = null;
+          saveState();
+          document.getElementById('mainApp').classList.add('hidden');
+          document.getElementById('authSection').classList.remove('hidden');
+          showToast('Logged out');
+        });
+      });
+
+      document.getElementById('mobileNavToggle').addEventListener('click', () => {
+        document.getElementById('sidebar').classList.toggle('hidden');
+      });
+
+      window.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+          e.preventDefault();
+          openModal('searchModal');
+          document.getElementById('globalSearchInput').focus();
+        }
+        if (e.key === 'Escape') closeModal('searchModal');
+      });
+
+      document.getElementById('openSearchBtn').addEventListener('click', () => {
+        openModal('searchModal');
+        document.getElementById('globalSearchInput').focus();
+      });
+      document.getElementById('closeSearchBtn').addEventListener('click', () => closeModal('searchModal'));
+      document.getElementById('globalSearchInput').addEventListener('input', (e) => handleGlobalSearch(e.target.value));
+
+      document.getElementById('addTaskForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        appState.tasks.unshift({
+          id: 'task_' + Date.now(),
+          title: document.getElementById('taskTitle').value,
+          subject: document.getElementById('taskSubject').value,
+          date: document.getElementById('taskDate').value,
+          priority: document.getElementById('taskPriority').value,
+          completed: false
+        });
+        saveState();
+        showToast('Task added!', 'success');
+        document.getElementById('taskTitle').value = '';
+        renderPlannerView();
+      });
+
+      document.getElementById('addQuestionForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        appState.customQuestions.push({
+          subjectId: document.getElementById('qSubject').value,
+          question: document.getElementById('qText').value,
+          options: [
+            document.getElementById('qOptA').value,
+            document.getElementById('qOptB').value,
+            document.getElementById('qOptC').value,
+            document.getElementById('qOptD').value
+          ],
+          correct: parseInt(document.getElementById('qCorrect').value),
+          diff: document.getElementById('qDiff').value,
+          explanation: document.getElementById('qExplanation').value
+        });
+        saveState();
+        showToast('Custom question saved!', 'success');
+        closeModal('addQuestionModal');
+        renderSimulatorView();
+      });
+
+      document.getElementById('addResourceForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        appState.customResources.push({
+          title: document.getElementById('resTitle').value,
+          url: document.getElementById('resUrl').value,
+          subject: document.getElementById('resSubject').value,
+          type: document.getElementById('resType').value
+        });
+        saveState();
+        showToast('Custom resource link saved!', 'success');
+        closeModal('addResourceModal');
+        renderResourcesView();
+      });
+
+      document.getElementById('profileForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        appState.user.name = document.getElementById('profName').value;
+        appState.user.college = document.getElementById('profCollege').value;
+        appState.user.email = document.getElementById('profEmail').value;
+        appState.user.roll = document.getElementById('profRoll').value;
+        appState.user.cgpa = document.getElementById('profCgpa').value;
+        saveState();
+        showToast('Profile settings saved!', 'success');
+        renderDashboard();
+      });
+    });
+  </script>
+</body>
+</html>
